@@ -1,0 +1,208 @@
+{% load i18n leaflet_tags crispy_forms_tags templatetag_handlebars %}
+
+<style>
+    div.leaflet-control-geosearch {
+        display:none;
+    }
+    div#mg_meckern {
+        min-height:460px;
+    }
+</style>
+
+<div class="row">
+    {% leaflet_map map_name callback="window.map_init_basic" %}
+</div>
+
+<div class="container">
+    <div class="row">
+        {% crispy search_form %}
+    </div>
+</div>
+
+{% tplhandlebars "tpl-report_form" %}
+    {% crispy report_form %}
+    <button class="btn-send-report btn btn-warning">report</button>
+{% endtplhandlebars %}
+
+{% tplhandlebars "tpl-report" %}
+<blockquote>{{ comment }}<small>{{ date_modified }}</small></blockquote>
+{% endtplhandlebars %}
+
+<script type="text/javascript">
+// the report template
+var report_form_tpl = Handlebars.compile($('script#tpl-report_form').html())
+var report_form_popupContent = report_form_tpl({});
+var form_has_initialized = false;
+var report_tpl = Handlebars.compile($('script#tpl-report').html())
+
+var entered_data = {}
+
+function map_init_basic (map, options) {
+    // console.log(map)
+    // console.log(options)
+
+    map.doubleClickZoom.disable();
+
+    var marker = null;
+
+    {% for p in pins %}
+        marker = L.marker([{{ p.lat }}, {{ p.lon }}]);
+
+        var report_popupContent = report_tpl({
+            'comment': '{{ p.comment|escapejs }}',
+            'date_modified': '{{ p.date_modified }}',
+        });
+
+        marker.bindPopup(report_popupContent);
+        marker.addTo(map);
+    {% endfor %}
+
+    // Geo Search
+    window.GeoSearch = new L.Control.GeoSearch({
+        showMarker: false,
+        provider: new L.GeoSearch.Provider.OpenStreetMap()
+    }).addTo(map);
+
+    map.on('click', function ( e ) {
+        console.log(e)
+        map.panTo(e.latlng)
+        map.zoomIn()
+    });
+
+    var report_form_popup = L.popup().setContent(report_form_popupContent);
+
+    map.on('add_report_marker', function ( e ) {
+        // console.log('dblclick')
+        var latlng = map.getCenter();
+        var marker = new L.Marker(latlng, {title: 'New Report', draggable: true, riseOnHover: true})
+
+        marker.addTo(map);
+        marker.bindPopup(report_form_popup).openPopup();
+
+        marker.on('click', function ( e ) {
+            $('body').trigger('populate_report', [map, latlng, marker]);
+        });
+
+        // required to set the initial values
+        $('body').trigger('populate_report', [map, latlng, marker]);
+
+    });
+
+    /**
+    * fire the show marker button
+    */
+    map.on('geosearch_showlocation', function ( e ) {
+        $( "#add-marker-btn").trigger( "show" );
+    })
+
+    window.map = map;
+}
+
+$(document).ready(function () {
+
+    var add_marker_btn = $('<button/>', {
+        id: 'add-marker-btn',
+        class: 'btn btn-success hide',
+        text: 'Add Report',
+        click: function (event) {
+            event.preventDefault();
+            //add marker
+            window.map.fireEvent( "add_report_marker", {} );
+        }
+    });
+    add_marker_btn.on( "show", function( event ) {
+        $(this).removeClass('hide');
+    });
+    add_marker_btn.on( "hide", function( event ) {
+        $(this).addClass('hide');
+    });
+
+    // append the search button
+    var search_btn = $('<button/>', {
+        id: 'search-btn',
+        class: 'btn btn-info',
+        text: 'search',
+        click: function (event) {
+            event.preventDefault();
+            //search
+
+            // hide the add marker always
+            add_marker_btn.trigger('hide');
+
+            var qry = $('#id_q').val();
+            if (qry !== '') {
+                window.GeoSearch.geosearch(qry);
+            }
+        }
+    });
+
+    // add the search button
+    $('form').append(search_btn);
+    // append the add marker button
+    $('form').append(add_marker_btn);
+
+    $('body').on( "populate_report", function( event, map, latlng, marker ) {
+        console.log('fire populate report')
+        console.log((entered_data.id_address || $('#id_q').val() ))
+        $('#id_address:first').val( entered_data.id_address || $('#id_q').val());
+        $('#id_comment:first').val( entered_data.id_comment || '');
+        $('#id_email:first').val( entered_data.id_email || '');
+        $('#id_lat:first').val(latlng.lat.toFixed(15));
+        $('#id_lon:first').val(latlng.lng.toFixed(15));
+        console.log(entered_data)
+        // setup fhe form
+        $('body').trigger( "form_init", [map, latlng, marker] )
+    });
+
+    $('body').on( "form_init", function( event, map, latlng, marker ) {
+        if ( form_has_initialized === false ) {
+
+            form_has_initialized = true;
+
+            var form = $( 'div.leaflet-popup-content form' );
+            form.parsley();
+
+            $('div.leaflet-popup-content form input, div.leaflet-popup-content form textarea').on('change', function ( e ) {
+                console.log('settings value')
+                var elem = $(e.target);
+                entered_data[elem.attr('id')] = elem.val();
+            });
+
+            $('div.leaflet-popup-content button.btn-send-report').on("click", function ( e ) {
+                event.preventDefault();
+
+                console.log('send report')
+
+                if ( form.parsley( 'validate' ) === true ) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '{{ report_api_url }}',
+                        data: form.serialize(),
+                        context: this,
+                        success: function(data, status) {
+
+                            var pk = data.id
+                            $.ajax({
+                                type: 'GET',
+                                url: '{{ report_api_url }}' + pk + '/',
+                                success: function(data, status) {
+                                    marker.closePopup();
+                                    // update with nice template data
+                                    var popup = L.popup().setContent(report_tpl(data))
+                                    // bind to the new popup
+                                    marker.bindPopup(popup);
+                                    // now open it
+                                    marker.openPopup();
+                                }
+                            });
+
+                        }
+                    });
+                }
+            });
+
+        }
+    });
+
+});
+</script>

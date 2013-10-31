@@ -1,0 +1,51 @@
+{% load url from future %}
+{% load i18n leaflet_tags %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{% block page_title %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="//netdna.bootstrapcdn.com/bootswatch/3.0.0/spacelab/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.1/css/font-awesome.min.css" rel="stylesheet" media="screen">
+    
+    {% leaflet_css %}
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="{{ STATIC_URL }}js/html5shiv.js"></script>
+      <script src="{{ STATIC_URL }}js/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="//code.jquery.com/jquery.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.0.0/handlebars.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/parsley.js/1.1.16/parsley.min.js"></script>
+
+      <div class="navbar navbar-default navbar-static-top">
+          <div class="navbar-header">
+              <button type="button" data-toggle="collapse" data-target=".navbar-collapse" class="navbar-toggle">
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+              </button>
+              <a href="/" class="navbar-brand">Mönchengladbach - Meckern</a>
+          </div>
+          <div>
+              <ul class="nav navbar-nav">
+                  <li>
+                      <a href="{% url 'public:about' %}"><div class="icon-flag">About</div></a>
+                  </li>
+              </ul>
+          </div>
+      </div>
+
+    {% block prebody %}{% endblock %}
+    <div class="container">{% block content %}{% endblock %}</div>
+
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    
+    {% leaflet_js %}
+  </body>
+</html>
