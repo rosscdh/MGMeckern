@@ -33,7 +33,6 @@
 // the report template
 var report_form_tpl = Handlebars.compile($('script#tpl-report_form').html())
 var report_form_popupContent = report_form_tpl({});
-var form_has_initialized = false;
 var report_tpl = Handlebars.compile($('script#tpl-report').html())
 
 var entered_data = {}
@@ -168,55 +167,50 @@ $(document).ready(function () {
     });
 
     $('body').on( "form_init", function( event, map, latlng, marker ) {
-        if ( form_has_initialized === false ) {
 
-            form_has_initialized = true;
+        var form = $( 'div.leaflet-popup-content form' );
+        form.parsley();
 
-            var form = $( 'div.leaflet-popup-content form' );
-            form.parsley();
+        $('div.leaflet-popup-content form input, div.leaflet-popup-content form textarea').on('change', function ( e ) {
+            console.log('settings value')
+            var elem = $(e.target);
+            entered_data[elem.attr('id')] = elem.val();
+        });
 
-            $('div.leaflet-popup-content form input, div.leaflet-popup-content form textarea').on('change', function ( e ) {
-                console.log('settings value')
-                var elem = $(e.target);
-                entered_data[elem.attr('id')] = elem.val();
-            });
+        $('div.leaflet-popup-content button.btn-send-report').on("click", function ( e ) {
+            event.preventDefault();
 
-            $('div.leaflet-popup-content button.btn-send-report').on("click", function ( e ) {
-                event.preventDefault();
+            console.log('send report')
 
-                console.log('send report')
+            if ( form.parsley( 'validate' ) === true ) {
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ report_api_url }}',
+                    data: form.serialize(),
+                    context: this,
+                    success: function(data, status) {
 
-                if ( form.parsley( 'validate' ) === true ) {
-                    $.ajax({
-                        type: 'POST',
-                        url: '{{ report_api_url }}',
-                        data: form.serialize(),
-                        context: this,
-                        success: function(data, status) {
+                        var pk = data.id
+                        $.ajax({
+                            type: 'GET',
+                            url: '{{ report_api_url }}' + pk + '/',
+                            success: function(data, status) {
+                                current_marker.closePopup();
+                                // update with nice template data
+                                var popup = L.popup().setContent(report_tpl(data))
+                                // bind to the new popup
+                                current_marker.bindPopup(popup);
+                                // now open it
+                                current_marker.openPopup();
+                                // reset data
+                                entered_data = {};
+                            }
+                        });
 
-                            var pk = data.id
-                            $.ajax({
-                                type: 'GET',
-                                url: '{{ report_api_url }}' + pk + '/',
-                                success: function(data, status) {
-                                    current_marker.closePopup();
-                                    // update with nice template data
-                                    var popup = L.popup().setContent(report_tpl(data))
-                                    // bind to the new popup
-                                    current_marker.bindPopup(popup);
-                                    // now open it
-                                    current_marker.openPopup();
-                                    // reset data
-                                    entered_data = {};
-                                }
-                            });
-
-                        }
-                    });
-                }
-            });
-
-        }
+                    }
+                });
+            }
+        });
     });
 
 });
