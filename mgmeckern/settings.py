@@ -144,6 +144,8 @@ DJANGO_APPS = (
     'django.contrib.staticfiles',
     #'django.contrib.gis',
     'django.contrib.admin',
+    'django.contrib.markup',
+    'django.contrib.humanize',
 )
 
 PROJECT_APPS = (
