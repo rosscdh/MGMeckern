@@ -7,6 +7,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Div, Submit, HTML, Button, Row, Field
 from crispy_forms.bootstrap import AppendedText, PrependedText, FormActions
 
+from . import SEVERITY_CHOICES
 from .models import Report
 
 
@@ -15,13 +16,7 @@ class ReportForm(forms.ModelForm):
     """
     Public Form for the report model
     """
-    SEVERITY_CHOICES = (
-        (2, 'Critical'),
-        (1, 'Bad'),
-        (0, 'Irritating'),
-    )
-
-    severity = forms.ChoiceField(choices=SEVERITY_CHOICES, initial=0, widget=forms.RadioSelect)
+    severity = forms.ChoiceField(choices=SEVERITY_CHOICES.get_choices(), initial=0, widget=forms.RadioSelect)
     lat = forms.CharField(widget=forms.HiddenInput)
     lon = forms.CharField(widget=forms.HiddenInput)
 

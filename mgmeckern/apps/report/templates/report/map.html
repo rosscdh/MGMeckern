@@ -25,6 +25,7 @@
 {% endtplhandlebars %}
 
 {% tplhandlebars "tpl-report" %}
+<div class="label {{ css_severity }} pull-right">{{ severity }}</div>
 <blockquote>{{ comment }}<small>{{ date_modified }}</small></blockquote>
 {% endtplhandlebars %}
 
@@ -52,6 +53,8 @@ function map_init_basic (map, options) {
         var report_popupContent = report_tpl({
             'comment': '{{ p.comment|escapejs }}',
             'date_modified': '{{ p.date_modified }}',
+            'severity': '{{ p.display_severity }}',
+            'css_severity': '{{ p.css_severity }}',
         });
         marker.pk = {{ p.pk }}; // used to identify it as "set"
         marker.bindPopup(report_popupContent);

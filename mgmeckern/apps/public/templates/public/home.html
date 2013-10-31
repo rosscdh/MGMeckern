@@ -17,6 +17,7 @@
       <tr>
         <th>Address</th>
         <th>Comment</th>
+        <th>Level</th>
       </tr>
     </thead>
     <tbody>
@@ -24,6 +25,7 @@
         <tr>
             <td>{{ r.address }}</td>
             <td><blockquote>{{ r.comment|truncatewords:15 }}<small>{{ r.date_modified }}</small></blockquote></td>
+            <td><span class="label {{ r.css_severity }}">{{ r.display_severity }}</div></td>
         </tr>
         {% endfor %}
     </tbody>

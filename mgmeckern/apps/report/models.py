@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+from . import SEVERITY_CHOICES
 
 
 class Report(models.Model):
@@ -19,3 +20,19 @@ class Report(models.Model):
 
     class Meta:
         ordering = ['-id']
+
+    @property
+    def display_severity(self):
+        return SEVERITY_CHOICES.get_desc_by_value(self.severity)
+
+    @property
+    def css_severity(self):
+        """
+        @TODO should be template tag
+        """
+        if SEVERITY_CHOICES.critical == self.severity:
+            return 'label-danger'
+        elif SEVERITY_CHOICES.bad == self.severity:
+            return 'label-warning'
+        else:
+            return 'label-info'
