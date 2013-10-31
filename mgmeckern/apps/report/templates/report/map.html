@@ -36,6 +36,7 @@ var form_has_initialized = false;
 var report_tpl = Handlebars.compile($('script#tpl-report').html())
 
 var entered_data = {}
+var current_marker = null;
 
 function map_init_basic (map, options) {
     // console.log(map)
@@ -52,7 +53,7 @@ function map_init_basic (map, options) {
             'comment': '{{ p.comment|escapejs }}',
             'date_modified': '{{ p.date_modified }}',
         });
-
+        marker.pk = {{ p.pk }}; // used to identify it as "set"
         marker.bindPopup(report_popupContent);
         marker.addTo(map);
     {% endfor %}
@@ -63,37 +64,46 @@ function map_init_basic (map, options) {
         provider: new L.GeoSearch.Provider.OpenStreetMap()
     }).addTo(map);
 
-    map.on('click', function ( e ) {
-        console.log(e)
-        map.panTo(e.latlng)
-        map.zoomIn()
-    });
 
-    var report_form_popup = L.popup().setContent(report_form_popupContent);
+    var report_form_popup = L.popup({minWidth: 320, maxWidth: 450}).setContent(report_form_popupContent);
 
     map.on('add_report_marker', function ( e ) {
         // console.log('dblclick')
-        var latlng = map.getCenter();
+        var latlng = e.latlng || map.getCenter();
         var marker = new L.Marker(latlng, {title: 'New Report', draggable: true, riseOnHover: true})
+        marker.pk = null; // used to id our map markers
 
-        marker.addTo(map);
-        marker.bindPopup(report_form_popup).openPopup();
+        marker.addTo(map)
+              .bindPopup(report_form_popup)
+              .openPopup();
 
-        marker.on('click', function ( e ) {
-            $('body').trigger('populate_report', [map, latlng, marker]);
-        });
-
-        // required to set the initial values
+        current_marker = marker;
         $('body').trigger('populate_report', [map, latlng, marker]);
-
     });
 
+    /**
+    * on double click on map then add the report marker
+    */
+    map.on("dblclick", function ( e ) {
+        window.map.fireEvent( "add_report_marker", {latlng: e.latlng} );
+    })
     /**
     * fire the show marker button
     */
     map.on('geosearch_showlocation', function ( e ) {
         $( "#add-marker-btn").trigger( "show" );
     })
+
+    map.on('popupopen', function ( e ) {
+        /**
+        * fire this event when we are looking at a new report form popup
+        */
+        if ( e.popup == report_form_popup ) {
+            var latlng = e.popup._latlng;
+            var marker = e.target;
+            $('body').trigger('populate_report', [map, latlng, marker]);
+        }
+    });
 
     window.map = map;
 }
@@ -142,14 +152,14 @@ $(document).ready(function () {
     $('form').append(add_marker_btn);
 
     $('body').on( "populate_report", function( event, map, latlng, marker ) {
-        console.log('fire populate report')
-        console.log((entered_data.id_address || $('#id_q').val() ))
+        //console.log('fire populate report')
+        //console.log((entered_data.id_address || $('#id_q').val() ))
         $('#id_address:first').val( entered_data.id_address || $('#id_q').val());
         $('#id_comment:first').val( entered_data.id_comment || '');
         $('#id_email:first').val( entered_data.id_email || '');
         $('#id_lat:first').val(latlng.lat.toFixed(15));
         $('#id_lon:first').val(latlng.lng.toFixed(15));
-        console.log(entered_data)
+        //console.log(entered_data)
         // setup fhe form
         $('body').trigger( "form_init", [map, latlng, marker] )
     });
@@ -186,13 +196,15 @@ $(document).ready(function () {
                                 type: 'GET',
                                 url: '{{ report_api_url }}' + pk + '/',
                                 success: function(data, status) {
-                                    marker.closePopup();
+                                    current_marker.closePopup();
                                     // update with nice template data
                                     var popup = L.popup().setContent(report_tpl(data))
                                     // bind to the new popup
-                                    marker.bindPopup(popup);
+                                    current_marker.bindPopup(popup);
                                     // now open it
-                                    marker.openPopup();
+                                    current_marker.openPopup();
+                                    // reset data
+                                    entered_data = {};
                                 }
                             });
 

@@ -8,7 +8,8 @@ class Report(models.Model):
     """
     email = models.EmailField()
     comment = models.TextField()
-    address = models.CharField(max_length=255)
+    address = models.CharField(max_length=255, blank=True)
+    severity = models.IntegerField()
     lat = models.DecimalField(max_digits=22, decimal_places=19)
     lon = models.DecimalField(max_digits=22, decimal_places=19)
 

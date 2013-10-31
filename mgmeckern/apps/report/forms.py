@@ -15,8 +15,15 @@ class ReportForm(forms.ModelForm):
     """
     Public Form for the report model
     """
-    # lat = forms.CharField(widget=forms.HiddenInput)
-    # lon = forms.CharField(widget=forms.HiddenInput)
+    SEVERITY_CHOICES = (
+        (2, 'Critical'),
+        (1, 'Bad'),
+        (0, 'Irritating'),
+    )
+
+    severity = forms.ChoiceField(choices=SEVERITY_CHOICES, initial=0, widget=forms.RadioSelect)
+    lat = forms.CharField(widget=forms.HiddenInput)
+    lon = forms.CharField(widget=forms.HiddenInput)
 
     class Meta:
         model = Report
@@ -30,7 +37,7 @@ class ReportForm(forms.ModelForm):
 
 @parsleyfy
 class AddressSearchForm(forms.Form):
-    q = forms.CharField(label='', widget=forms.TextInput(attrs={'class': 'input-lg col-lg-12', 'placeholder': 'Street Address...'}))
+    q = forms.CharField(label='', initial='', widget=forms.TextInput(attrs={'class': 'input-lg col-lg-12', 'placeholder': 'Street Address...'}))
 
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
