@@ -146,10 +146,10 @@ $(function() {
                 var address = (self.entered_data.id_address || self.options.q.val() || null);
 
                 if ( address === null) {
-                    $('#id_address:first').hide();
+                    $('#div_id_address:first').hide(); // hide the outer parent row
                     $('#id_address:first').val( '' );
                 } else {
-                    $('#id_address:first').show();
+                    $('#div_id_address:first').show(); // show the outer parent row
                     $('#id_address:first').val( address );
                 }
 
