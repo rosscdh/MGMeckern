@@ -22,24 +22,10 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-try:
-    # production settings
-    f = os.environ['CRED_FILE']
-    db_data = json.load(open(f))['MYSQLS']
-
-    db_config = {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': db_data['MYSQLS_DATABASE'],
-        'USER': db_data['MYSQLS_USERNAME'],
-        'PASSWORD': db_data['MYSQLS_PASSWORD'],
-        'HOST': db_data['MYSQLS_HOSTNAME'],
-        'PORT': db_data['MYSQLS_PORT'],
-    }
-except KeyError, IOError:
-    db_config = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(SITE_ROOT, 'dev.db'),
-    }
+db_config = {
+    'ENGINE': 'django.db.backends.sqlite3',
+    'NAME': os.path.join(SITE_ROOT, 'dev.db'),
+}
 
 DATABASES = {
     'default': db_config
