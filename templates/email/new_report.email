@@ -1,0 +1,17 @@
+{% block subject %}A new Report has been lodged{% endblock %}
+
+{% block plain %}{% spaceless %}
+Hi there,
+
+A new problem has been lodged.
+
+Date: {{ date_created }}
+From: {{ email }}
+Severity: {{ severity }}
+{% if address %}Address: {{ address }}{% endif %}
+
+Comment
+---------------
+{{ comment }}
+
+{% endspaceless %}{% endblock %}
