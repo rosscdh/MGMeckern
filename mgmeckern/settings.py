@@ -10,8 +10,7 @@ for test_app in ['testserver','test']:
     if test_app in sys.argv[1:2]:
         IS_TESTING = True
 
-SITE_ROOT = os.path.dirname(os.path.realpath(__file__+ '/../'))
-
+SITE_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
