@@ -9,14 +9,24 @@
     }
 </style>
 
-<div class="row">
-    {% leaflet_map map_name callback="window.map_init_basic" %}
+<div class="container">
+    <div class="page-header text-center">
+        <h2>Where is the problem?</h2>
+        <small>So you have found a problem that you think needs to be looked at or repaired?</small>
+    </div>
+    <div class="row text-center">
+        <div class="col-md-8">
+            {% crispy search_form %}
+        </div>
+        <div class="col-md-4 text-center">
+            <p>Enter the street address or use the map below to find the location of the problem.</p>
+            <p>Double cick the map to add a new report!</p>
+        </div>
+    </div>
 </div>
 
-<div class="container">
-    <div class="row">
-        {% crispy search_form %}
-    </div>
+<div class="row">
+    <span id="mgmeckern-map">{% leaflet_map map_name callback="window.map_init_basic" %}</span>
 </div>
 
 {% tplhandlebars "tpl-report_form" %}
@@ -30,188 +40,303 @@
 {% endtplhandlebars %}
 
 <script type="text/javascript">
-// the report template
-var report_form_tpl = Handlebars.compile($('script#tpl-report_form').html())
-var report_form_popupContent = report_form_tpl({});
-var report_tpl = Handlebars.compile($('script#tpl-report').html())
+'use strict';
 
-var entered_data = {}
-var current_marker = null;
+/**
+* Map Plugin & Controls
+* for the mgmeckern-app
+*/
+$(function() {
 
-function map_init_basic (map, options) {
-    // console.log(map)
-    // console.log(options)
-
-    map.doubleClickZoom.disable();
-
-    var marker = null;
-
-    {% for p in pins %}
-        marker = L.marker([{{ p.lat }}, {{ p.lon }}]);
-
-        var report_popupContent = report_tpl({
-            'comment': '{{ p.comment|escapejs }}',
-            'date_modified': '{{ p.date_modified }}',
-            'display_severity': '{{ p.display_severity }}',
-            'css_severity': '{{ p.css_severity }}',
-        });
-        marker.pk = {{ p.pk }}; // used to identify it as "set"
-        marker.bindPopup(report_popupContent);
-        marker.addTo(map);
-    {% endfor %}
-
-    // Geo Search
-    window.GeoSearch = new L.Control.GeoSearch({
-        showMarker: false,
-        provider: new L.GeoSearch.Provider.OpenStreetMap()
-    }).addTo(map);
-
-
-    var report_form_popup = L.popup({minWidth: 320, maxWidth: 450}).setContent(report_form_popupContent);
-
-    map.on('add_report_marker', function ( e ) {
-        // console.log('dblclick')
-        var latlng = e.latlng || map.getCenter();
-        var marker = new L.Marker(latlng, {title: 'New Report', draggable: true, riseOnHover: true})
-        marker.pk = null; // used to id our map markers
-
-        marker.addTo(map)
-              .bindPopup(report_form_popup)
-              .openPopup();
-
-        current_marker = marker;
-        $('body').trigger('populate_report', [map, latlng, marker]);
-    });
-
-    /**
-    * on double click on map then add the report marker
-    */
-    map.on("dblclick", function ( e ) {
-        window.map.fireEvent( "add_report_marker", {latlng: e.latlng} );
-    })
-    /**
-    * fire the show marker button
-    */
-    map.on('geosearch_showlocation', function ( e ) {
-        $( "#add-marker-btn").trigger( "show" );
-    })
-
-    map.on('popupopen', function ( e ) {
-        /**
-        * fire this event when we are looking at a new report form popup
-        */
-        if ( e.popup == report_form_popup ) {
-            var latlng = e.popup._latlng;
-            var marker = e.target;
-            $('body').trigger('populate_report', [map, latlng, marker]);
-        }
-    });
-
-    window.map = map;
-}
-
-$(document).ready(function () {
-
-    var add_marker_btn = $('<button/>', {
-        id: 'add-marker-btn',
-        class: 'btn btn-success hide',
-        text: 'Add Report',
-        click: function (event) {
-            event.preventDefault();
-            //add marker
-            window.map.fireEvent( "add_report_marker", {} );
-        }
-    });
-    add_marker_btn.on( "show", function( event ) {
-        $(this).removeClass('hide');
-    });
-    add_marker_btn.on( "hide", function( event ) {
-        $(this).addClass('hide');
-    });
-
-    // append the search button
-    var search_btn = $('<button/>', {
-        id: 'search-btn',
-        class: 'btn btn-info',
-        text: 'search',
-        click: function (event) {
-            event.preventDefault();
-            //search
-
-            // hide the add marker always
-            add_marker_btn.trigger('hide');
-
-            var qry = $('#id_q').val();
-            if (qry !== '') {
-                window.GeoSearch.geosearch(qry);
+    $.widget( "mgmeckern.map_control", {
+        map: null,
+        geo_search: null,
+        current_marker: null,  // the currently selected marker - as leaf does not seem to prvide a way to get a popups bound marker
+        report_form_popup: null, // the popup that consistenly provides the form
+        entered_data: {},
+        // templates
+        templates: {
+            'report_form': null,
+            'report': null,
+        },
+        // default options
+        options: {
+            'map': null,
+            'map_options': null,
+            'create_report_url': null,
+            'q': $('#id_q'), // address search element
+            'search_btn': $('input#search-btn'), // address search button
+            'add_marker_btn': $('input#add-marker-btn'),    // add marker button
+            'report_form_tpl': $('script#tpl-report_form'), // the report form template
+            'report_tpl': $('script#tpl-report'),   // the report display template
+            'debug': true
+        },
+        _log: function ( msg ) {
+            var self = this;
+            if ( self.options.debug === true ) {
+                console.log( msg )
             }
-        }
-    });
+        },
+        // the constructor
+        _create: function () {
+            var self = this;
+            self._log('creating')
 
-    // add the search button
-    $('form').append(search_btn);
-    // append the add marker button
-    $('form').append(add_marker_btn);
+            self.set_templates();
+            self._controls();
+            self._listen();
 
-    $('body').on( "populate_report", function( event, map, latlng, marker ) {
-        //console.log('fire populate report')
-        //console.log((entered_data.id_address || $('#id_q').val() ))
-        $('#id_address:first').val( entered_data.id_address || $('#id_q').val());
-        $('#id_comment:first').val( entered_data.id_comment || '');
-        $('#id_email:first').val( entered_data.id_email || '');
-        $('#id_lat:first').val(latlng.lat.toFixed(15));
-        $('#id_lon:first').val(latlng.lng.toFixed(15));
-        //console.log(entered_data)
-        // setup fhe form
-        $('body').trigger( "form_init", [map, latlng, marker] )
-    });
+            // if we have the map and map options passed in
+            // then init the map
+            if ( self.options.map && self.options.map_options ) {
+                self.init_map(self.options.map, self.options.map_options);
+            }
 
-    $('body').on( "form_init", function( event, map, latlng, marker ) {
+            // assign to window so we can access it
+            if (self.options.debug === true)
+                window.map_control = self;
+        },
+        _controls: function () {
+            var self = this;
+            self._log('setting controls');
+            // setup the reuseable report form
+            self.report_form_popup = self.init_report_form_popup();
 
-        var form = $( 'div.leaflet-popup-content form' );
-        form.parsley();
+            // hide the add-maker-btn by default
+            self.options.add_marker_btn.hide();
+        },
+        _listen: function () {
+            var self = this;
+            self._log('listening');
 
-        $('div.leaflet-popup-content form input, div.leaflet-popup-content form textarea').on('change', function ( e ) {
-            console.log('settings value')
-            var elem = $(e.target);
-            entered_data[elem.attr('id')] = elem.val();
-        });
+            // global new search event
+            $('body').on('new_search', function ( e ) {
+                self._log('new_search');
+                // hide the add markert button
+                self.options.add_marker_btn.hide();
+    
+                if ( self.options.q )
+                    self._log('have a q element');
+                    var qry = self.options.q.val();
+                    if (qry !== '') {
+                        self._log('q element value is present');
+                        self._log('sending geosearch query');
+                        self.geo_search.geosearch(qry);
+                    }
+    
+            });
 
-        $('div.leaflet-popup-content button.btn-send-report').on("click", function ( e ) {
-            event.preventDefault();
+            // global add marker event
+            $('body').on('add_marker', function ( e ) {
+                self._log('add_marker');
+                self.map.fireEvent( "add_report_marker");
+            });
 
-            console.log('send report')
+            // found geosearch results
+            $('body').on('geosearch_results_found', function ( e ) {
+                self._log('found geosearch results');
+                // show the add_marker btn
+                self.options.add_marker_btn.show();
+            });
 
-            if ( form.parsley( 'validate' ) === true ) {
-                $.ajax({
-                    type: 'POST',
-                    url: '{{ report_api_url }}',
-                    data: form.serialize(),
-                    context: this,
-                    success: function(data, status) {
+            // populate the report form
+            $('body').on( "populate_report_form", function( event, map, latlng, marker ) {
+                self._log('populate_report_form');
 
-                        var pk = data.id
+                var address = (self.entered_data.id_address || self.options.q.val() || null);
+
+                if ( address === null) {
+                    $('#id_address:first').hide();
+                    $('#id_address:first').val( '' );
+                } else {
+                    $('#id_address:first').show();
+                    $('#id_address:first').val( address );
+                }
+
+                $('#id_comment:first').val( self.entered_data.id_comment || '');
+                $('#id_email:first').val( self.entered_data.id_email || '');
+                $('#id_lat:first').val(latlng.lat.toFixed(15));
+                $('#id_lon:first').val(latlng.lng.toFixed(15));
+
+                // setup fhe form
+                $('body').trigger( "form_init", [map, latlng, marker] )
+            });
+
+            // form initialization and parslification
+            $('body').on( "form_init", function( event, map, latlng, marker ) {
+                self._log('report form_init');
+
+                var form = $( 'div.leaflet-popup-content form' );
+                form.parsley();
+
+                $('div.leaflet-popup-content form input, div.leaflet-popup-content form textarea').on('change', function ( e ) {
+                    console.log('settings value')
+                    var elem = $(e.target);
+                    self.entered_data[elem.attr('id')] = elem.val();
+                });
+
+                $('div.leaflet-popup-content button.btn-send-report').on("click", function ( e ) {
+                    event.preventDefault();
+
+                    self._log('send report')
+
+                    if ( form.parsley( 'validate' ) === true ) {
                         $.ajax({
-                            type: 'GET',
-                            url: '{{ report_api_url }}' + pk + '/',
+                            type: 'POST',
+                            url: self.options.create_report_url,
+                            data: form.serialize(),
+                            context: this,
                             success: function(data, status) {
-                                current_marker.closePopup();
+                                // ok so we have a winner
+                                self.current_marker.closePopup();
+                                var pk = data.id
                                 // update with nice template data
-                                var popup = L.popup().setContent(report_tpl(data))
+                                var popup = L.popup().setContent(self.templates.report(data))
                                 // bind to the new popup
-                                current_marker.bindPopup(popup);
+                                self.current_marker.bindPopup(popup);
                                 // now open it
-                                current_marker.openPopup();
+                                self.current_marker.openPopup();
                                 // reset data
-                                entered_data = {};
+                                self.entered_data = {};
                             }
                         });
-
                     }
                 });
-            }
-        });
+            });
+
+            /**
+            * button controls
+            */
+            self.options.search_btn.on('click', function ( e ) {
+                event.preventDefault();
+                self._log('trigger new_search');
+                $('body').trigger('new_search');
+            });
+
+            self.options.add_marker_btn.on('click', function ( e ) {
+                event.preventDefault();
+                self._log('trigger add_marker');
+                $('body').trigger('add_marker');
+            });
+
+        },
+        set_templates: function () {
+            var self = this;
+            self._log('setting templates');
+            self.templates.report_form = Handlebars.compile( self.options.report_form_tpl.html() );
+            self.templates.report = Handlebars.compile( self.options.report_tpl.html() );
+        },
+        geosearch_provider: function () {
+            var self = this;
+            self._log('getting the geosearch provider');
+            return new L.Control.GeoSearch({
+                        showMarker: false,
+                        provider: new L.GeoSearch.Provider.OpenStreetMap()
+                    })
+        },
+        init_report_form_popup: function () {
+            var self = this;
+            return L.popup({ 
+                        minWidth: 320,
+                        maxWidth: 450
+                    })
+                    .setContent(
+                        self.templates.report_form({}) // init the basic form template
+                    );
+        },
+        /**
+        * This method is called from the django-leaf callback
+        */
+        init_map: function (map, options) {
+            var self = this;
+            self._log('initializing the map');
+            var marker = null;
+            self.map = map;
+
+            self.map.doubleClickZoom.disable();
+
+            // Add marker pins for existing events
+            // @TODO this wil need to become a rest call eventually
+            {% for p in pins %}
+                marker = L.marker([{{ p.lat }}, {{ p.lon }}]);
+
+                var report_popupContent = self.templates.report({
+                    'comment': '{{ p.comment|escapejs }}',
+                    'date_modified': '{{ p.date_modified }}',
+                    'display_severity': '{{ p.display_severity }}',
+                    'css_severity': '{{ p.css_severity }}',
+                });
+                marker.pk = {{ p.pk }}; // used to identify it as "set"
+                marker.bindPopup(report_popupContent);
+                marker.addTo(self.map);
+            {% endfor %}
+
+            // Geo Search
+            self.geo_search = self.geosearch_provider();
+            self.geo_search.addTo(self.map);
+
+
+            // setup the map listeners
+            self._map_listen(map);
+        },
+        /**
+        * Listeners that are specific to our map instance
+        */
+        _map_listen: function (map) {
+            var self = this;
+
+            map.on('add_report_marker', function ( e ) {
+                // console.log('dblclick')
+                var latlng = e.latlng || map.getCenter();
+                var marker = new L.Marker(latlng, {title: 'New Report', draggable: true, riseOnHover: true})
+                marker.pk = null; // used to id our map markers
+
+                marker.addTo(map)
+                      .bindPopup(self.report_form_popup)
+                      .openPopup();
+
+                self.current_marker = marker;
+
+                $('body').trigger('populate_report_form', [map, latlng, marker]);
+            });
+
+            /**
+            * on double click on map then add the report marker
+            */
+            map.on("dblclick", function ( e ) {
+                self.map.fireEvent( "add_report_marker", {latlng: e.latlng} );
+            })
+            /**
+            * fire the show marker button
+            */
+            map.on('geosearch_showlocation', function ( e ) {
+                $('body').trigger( "geosearch_results_found" );
+            })
+
+            map.on('popupopen', function ( e ) {
+                /**
+                * fire this event when we are looking at a new report form popup
+                */
+                if ( e.popup == self.report_form_popup ) {
+                    var latlng = e.popup._latlng;
+                    var marker = e.target;
+                    $('body').trigger('populate_report_form', [map, latlng, marker]);
+                }
+            });
+        }
     });
 
 });
+
+/**
+* Callback called by leaf js when the map is loaded
+*/
+function map_init_basic (map, options) {
+    // initialize our map
+    $('#mgmeckern-map').map_control({
+            'map':map,
+            'map_options': options,
+            'create_report_url': '{{ report_api_url }}'
+    });
+}
 </script>
