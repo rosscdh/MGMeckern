@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
-import json
 
 PROJECT_ENVIRONMENT = 'dev'
 
