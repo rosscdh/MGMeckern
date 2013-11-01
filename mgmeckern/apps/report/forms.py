@@ -27,6 +27,7 @@ class ReportForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
         self.helper.form_id = 'frm-create-report'
+        self.helper.form_class = 'parsley'
         self.helper.layout = Layout(
             'email',
             'comment',
