@@ -27,7 +27,15 @@ class ReportForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
         self.helper.form_id = 'frm-create-report'
-        #self.helper.layout = Layout()
+        self.helper.layout = Layout(
+            'email',
+            'comment',
+            'address',
+            'severity',
+            'lat',
+            'lon',
+            Button('btn-send-report', 'Report', css_id='id_btn-send-report', css_class='btn-send-report btn btn-warning'),
+        )
         super(ReportForm, self).__init__(*args, **kwargs)
 
 

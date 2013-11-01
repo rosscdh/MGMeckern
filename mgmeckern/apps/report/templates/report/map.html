@@ -32,7 +32,6 @@
 
 {% tplhandlebars "tpl-report_form" %}
     {% crispy report_form %}
-    <button class="btn-send-report btn btn-warning">report</button>
 {% endtplhandlebars %}
 
 {% tplhandlebars "tpl-report" %}
@@ -167,18 +166,24 @@ $(function() {
             $('body').on( "form_init", function( event, map, latlng, marker ) {
                 self._log('report form_init');
 
-                var form = $( 'div.leaflet-popup-content form' );
+                var form = $( '#frm-create-report' );
                 form.parsley();
 
-                $('div.leaflet-popup-content form input, div.leaflet-popup-content form textarea').on('change', function ( e ) {
+                $('#frm-create-report textarea').on('change', function ( e ) {
                     console.log('settings value')
                     var elem = $(e.target);
                     self.entered_data[elem.attr('id')] = elem.val();
                 });
 
-                $('div.leaflet-popup-content button.btn-send-report').on("click", function ( e ) {
+                // stop the ormal form submit action from happening
+                $("#frm-create-report").off('submit').on('submit', function ( e ) {
+                    console.log('form submit: frm-create-report')
                     e.preventDefault();
                     e.stopPropagation();
+                });
+
+                $('#id_btn-send-report').off('click').on("click", function ( e ) {
+                    e.preventDefault();
 
                     self._log('send report')
 
@@ -349,13 +354,6 @@ function map_init_basic (map, options) {
 $(document).ready(function(){
 
     $('#div_id_q').addClass('col-md-10');
-
-    // stop the ormal form submit action from happening
-    $("form#frm-create-report").on('submit', function ( e ) {
-        console.log('form submit: frm-create-report')
-        e.preventDefault();
-        e.stopPropagation();
-    });
 
     $('form#frm-address-search').keypress( function ( e ) {
         if ( e.keyCode == 10 || e.keyCode == 13 ) {
