@@ -21,6 +21,13 @@ class Report(models.Model):
     class Meta:
         ordering = ['-id']
 
+    def __unicode__(self):
+        return u'{comment} @ {address}'.format(comment=self.comment, address=self.address if self.address not in [None, ''] else self.latlng )
+
+    @property
+    def latlng(self):
+        return (self.lat, self.lon)
+
     @property
     def display_severity(self):
         return SEVERITY_CHOICES.get_desc_by_value(self.severity)
