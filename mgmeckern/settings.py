@@ -147,7 +147,7 @@ HELPER_APPS = (
 
 INSTALLED_APPS = DJANGO_APPS + HELPER_APPS + PROJECT_APPS
 
-if getattr(os.environ, 'EMAIL_BACKEND') and os.environ['EMAIL_BACKEND'] not in ['', None]:
+if 'EMAIL_BACKEND' in os.environ and os.environ['EMAIL_BACKEND'] not in ['', None]:
     EMAIL_BACKEND = os.environ['EMAIL_BACKEND']
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
@@ -159,11 +159,12 @@ TEMPLATED_EMAIL_BACKEND = 'templated_email.backends.vanilla_django.TemplateBacke
 TEMPLATED_EMAIL_TEMPLATE_DIR = 'email/'
 TEMPLATED_EMAIL_FILE_EXTENSION = 'email'
 
-EMAIL_HOST_USER = os.environ['SENDGRID_USERNAME']
-EMAIL_HOST_PASSWORD = os.environ['SENDGRID_PASSWORD']
-EMAIL_HOST= 'smtp.sendgrid.net'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+if 'SENDGRID_USERNAME' in os.environ:
+    EMAIL_HOST_USER = os.environ['SENDGRID_USERNAME']
+    EMAIL_HOST_PASSWORD = os.environ['SENDGRID_PASSWORD']
+    EMAIL_HOST= 'smtp.sendgrid.net'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
