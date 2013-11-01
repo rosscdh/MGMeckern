@@ -16,7 +16,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+    ("Ross Crawford-'dHeureuse", 'sendrossemail@gmail.com'),
 )
 
 MANAGERS = ADMINS
@@ -151,6 +151,14 @@ INSTALLED_APPS = DJANGO_APPS + HELPER_APPS + PROJECT_APPS
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
+
+#
+# Templated Email
+#
+TEMPLATED_EMAIL_BACKEND = 'templated_email.backends.vanilla_django.TemplateBackend'
+TEMPLATED_EMAIL_TEMPLATE_DIR = 'email/'
+TEMPLATED_EMAIL_FILE_EXTENSION = 'email'
+
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

@@ -43,3 +43,9 @@ class Report(models.Model):
             return 'label-warning'
         else:
             return 'label-info'
+
+
+"""
+Import the signals
+"""
+from .signals import on_new_report
