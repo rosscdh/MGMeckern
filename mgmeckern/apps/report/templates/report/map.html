@@ -177,7 +177,8 @@ $(function() {
                 });
 
                 $('div.leaflet-popup-content button.btn-send-report').on("click", function ( e ) {
-                    event.preventDefault();
+                    e.preventDefault();
+                    e.stopPropagation();
 
                     self._log('send report')
 
@@ -209,13 +210,17 @@ $(function() {
             * button controls
             */
             self.options.search_btn.on('click', function ( e ) {
-                event.preventDefault();
+                e.preventDefault();
+                e.stopPropagation();
+
                 self._log('trigger new_search');
                 $('body').trigger('new_search');
             });
 
             self.options.add_marker_btn.on('click', function ( e ) {
-                event.preventDefault();
+                e.preventDefault();
+                e.stopPropagation();
+
                 self._log('trigger add_marker');
                 $('body').trigger('add_marker');
             });
@@ -250,9 +255,9 @@ $(function() {
         */
         init_map: function (map, options) {
             var self = this;
-            self._log('initializing the map');
             var marker = null;
             self.map = map;
+            self._log('initializing the map');
 
             self.map.doubleClickZoom.disable();
 
@@ -283,7 +288,7 @@ $(function() {
         /**
         * Listeners that are specific to our map instance
         */
-        _map_listen: function (map) {
+        _map_listen: function ( map ) {
             var self = this;
 
             map.on('add_report_marker', function ( e ) {
@@ -345,9 +350,17 @@ $(document).ready(function(){
 
     $('#div_id_q').addClass('col-md-10');
 
-    $('form#frm-address-search').keypress(function(event){
-        if (event.keyCode == 10 || event.keyCode == 13) {
-            event.preventDefault();
+    // stop the ormal form submit action from happening
+    $("form#frm-create-report").on('submit', function ( e ) {
+        console.log('form submit: frm-create-report')
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    $('form#frm-address-search').keypress( function ( e ) {
+        if ( e.keyCode == 10 || e.keyCode == 13 ) {
+            e.preventDefault();
+            e.stopPropagation();
             // trigger the search click event
             window.map_control.options.search_btn.trigger('click');
         }
