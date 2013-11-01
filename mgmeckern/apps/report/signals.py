@@ -23,7 +23,7 @@ def on_new_report(sender, **kwargs):
         send_templated_mail(
                 template_name='new_report',
                 from_email=FROM_EMAIL,
-                recipient_list=[email for email, name in settings.MANAGERS],
+                recipient_list=[email for name, email in settings.MANAGERS],
                 context={
                     'email': report.email,
                     'comment': report.comment,
