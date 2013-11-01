@@ -32,20 +32,27 @@ class ReportForm(forms.ModelForm):
 
 @parsleyfy
 class AddressSearchForm(forms.Form):
-    q = forms.CharField(label='', initial='', required=True, widget=forms.TextInput(attrs={'class': 'input-lg col-lg-12', 'placeholder': 'Street Address...'}))
+    q = forms.CharField(label='', initial='', required=True, widget=forms.TextInput(attrs={'class': 'form-control input-lg', 'placeholder': 'Street Address...'}))
 
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
+        self.helper.form_id = 'frm-address-search'
         self.helper.form_class = 'form-inline parsley'
         self.helper.field_template = 'bootstrap3/layout/inline_field.html'
+        self.helper.attrs = {'role': 'form', 'data-validate': 'parsley'}
 
         self.helper.layout = Layout(
-            Field(
+            Div(
                 'q',
+                Button('btn-search-btn', 'Search', css_id='search-btn', css_class='btn btn-info input-lg'),
+                #Field('q', css_class='form-control col-md-offset-6 input-lg'),
+                css_class='row '
             ),
-            ButtonHolder(
-                Button('btn-search-btn', 'Search', css_id='search-btn', css_class='btn btn-info'),
-                Button('btn-add-marker-btn', 'Add Report', css_id='add-marker-btn', css_class='btn btn-success'),
+            Div(
+                HTML('<div class="row"><p>&nbsp;</p></div>'),
+                Button('btn-add-marker-btn', 'Add Report', css_id='add-marker-btn', css_class='btn btn-lg btn-success hide'),
+                HTML('<div class="row"><p>&nbsp;</p></div>'),
+                css_class='row'
             ),
         )
         super(AddressSearchForm, self).__init__(*args, **kwargs)

@@ -14,19 +14,20 @@
         <h2>Where is the problem?</h2>
         <small>So you have found a problem that you think needs to be looked at or repaired?</small>
     </div>
-    <div class="row text-center">
-        <div class="col-md-8">
-            {% crispy search_form %}
-        </div>
-        <div class="col-md-4 text-center">
-            <p>Enter the street address or use the map below to find the location of the problem.</p>
-            <p>Double cick the map to add a new report!</p>
-        </div>
-    </div>
 </div>
 
 <div class="row">
     <span id="mgmeckern-map">{% leaflet_map map_name callback="window.map_init_basic" %}</span>
+    <div class="row text-center">
+        <small>Enter the street address or use the map to find the location of the problem you would like to report.</small><br/>
+        <small>Double cick the map to add a new report!</small>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row page-header text-center">
+        {% crispy search_form %}
+    </div>
 </div>
 
 {% tplhandlebars "tpl-report_form" %}
@@ -103,7 +104,7 @@ $(function() {
             self.report_form_popup = self.init_report_form_popup();
 
             // hide the add-maker-btn by default
-            self.options.add_marker_btn.hide();
+            self.options.add_marker_btn.addClass('hide');
         },
         _listen: function () {
             var self = this;
@@ -113,7 +114,7 @@ $(function() {
             $('body').on('new_search', function ( e ) {
                 self._log('new_search');
                 // hide the add markert button
-                self.options.add_marker_btn.hide();
+                self.options.add_marker_btn.addClass('hide');
     
                 if ( self.options.q )
                     self._log('have a q element');
@@ -136,7 +137,7 @@ $(function() {
             $('body').on('geosearch_results_found', function ( e ) {
                 self._log('found geosearch results');
                 // show the add_marker btn
-                self.options.add_marker_btn.show();
+                self.options.add_marker_btn.removeClass('hide');
             });
 
             // populate the report form
@@ -339,4 +340,18 @@ function map_init_basic (map, options) {
             'create_report_url': '{{ report_api_url }}'
     });
 }
+
+$(document).ready(function(){
+
+    $('#div_id_q').addClass('col-md-10');
+
+    $('form#frm-address-search').keypress(function(event){
+        if (event.keyCode == 10 || event.keyCode == 13) {
+            event.preventDefault();
+            // trigger the search click event
+            window.map_control.options.search_btn.trigger('click');
+        }
+    });
+
+});
 </script>
