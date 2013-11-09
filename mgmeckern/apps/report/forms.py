@@ -42,7 +42,7 @@ class ReportForm(forms.ModelForm):
 
 @parsleyfy
 class AddressSearchForm(forms.Form):
-    q = forms.CharField(label='', initial='', required=True, widget=forms.TextInput(attrs={'class': 'form-control input-lg', 'placeholder': 'Street Address...'}))
+    q = forms.CharField(label='', initial='', required=True, widget=forms.TextInput(attrs={'class': 'form-control input-lg', 'placeholder': _('Street Address...')}))
 
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
