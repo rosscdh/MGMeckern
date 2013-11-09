@@ -262,6 +262,8 @@ $(function() {
             var self = this;
             var marker = null;
             self.map = map;
+            self.map.markers = []; // container for our markers
+
             self._log('initializing the map');
 
             self.map.doubleClickZoom.disable();
@@ -280,6 +282,9 @@ $(function() {
                 marker.pk = {{ p.pk }}; // used to identify it as "set"
                 marker.bindPopup(report_popupContent);
                 marker.addTo(self.map);
+                marker.dragging.disable();
+                self.map.markers.push(marker);
+                self._log('Added pin {{ p.pk }} to map')
             {% endfor %}
 
             // Geo Search
