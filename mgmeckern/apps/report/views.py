@@ -9,7 +9,7 @@ class ReportViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    queryset = Report.objects.all()
+    queryset = Report.objects.active()
     serializer_class = ReportSerializer
 
     def get_serializer_class(self):
@@ -17,3 +17,7 @@ class ReportViewSet(viewsets.ModelViewSet):
             return CreateReportSerializer
          else:
             return ReportSerializer
+
+
+class DeletedReportViewSet(ReportViewSet):
+    queryset = Report.objects.deleted()
