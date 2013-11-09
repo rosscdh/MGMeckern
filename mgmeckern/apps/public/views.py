@@ -10,6 +10,6 @@ class PublicHomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(PublicHomeView, self).get_context_data(**kwargs)
         context.update({
-            'reports': Report.objects.all(),
+            'reports': Report.objects.active(),
         })
         return context

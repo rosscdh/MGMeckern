@@ -14,7 +14,7 @@ def report_map(context):
         'search_form': AddressSearchForm(),
         'report_form': ReportForm(),
         'report_api_url': '/api/v1/report/',
-        'pins': Report.objects.all(),
+        'pins': Report.objects.active(),
     })
 
     if 'map_name' not in context:
