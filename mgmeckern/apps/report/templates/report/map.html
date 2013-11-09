@@ -11,16 +11,16 @@
 
 <div class="container">
     <div class="page-header text-center">
-        <h2>Where is the problem?</h2>
-        <small>So you have found a problem that you think needs to be looked at or repaired?</small>
+        <h2>{% trans 'Where is the problem?' %}</h2>
+        <small>{% trans 'So you have found a problem that you think needs to be looked at or repaired?' %}</small>
     </div>
 </div>
 
 <div class="row">
     <span id="mgmeckern-map">{% leaflet_map map_name callback="window.map_init_basic" %}</span>
     <div class="row text-center">
-        <small>Enter the street address or use the map to find the location of the problem you would like to report.</small><br/>
-        <small>Double cick the map to add a new report!</small>
+        <small>{% trans 'Enter the street address or use the map to find the location of the problem you would like to report.' %}</small><br/>
+        <small>{% trans 'Double cick the map to add a new report!' %}</small>
     </div>
 </div>
 
