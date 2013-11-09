@@ -41,13 +41,17 @@ TIME_ZONE = 'Europe/Berlin'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'de-DE'
+LANGUAGE_CODE = 'de'
 
 gettext = lambda s: s
 
 LANGUAGES = (
     ('de', gettext('German')),
     ('en', gettext('English')),
+)
+
+LOCALE_PATHS = (
+    os.path.join(SITE_ROOT, 'locale'),
 )
 
 SITE_ID = 1
@@ -157,6 +161,8 @@ INSTALLED_APPS = DJANGO_APPS + HELPER_APPS + PROJECT_APPS
 
 if 'EMAIL_BACKEND' in os.environ and os.environ['EMAIL_BACKEND'] not in ['', None]:
     EMAIL_BACKEND = os.environ['EMAIL_BACKEND']
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
