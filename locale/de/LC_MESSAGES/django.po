@@ -1,0 +1,112 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-11-09 10:58+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: mgmeckern/settings.py:49
+msgid "German"
+msgstr ""
+
+#: mgmeckern/settings.py:50
+msgid "English"
+msgstr ""
+
+#: mgmeckern/apps/public/templates/public/about.html:3
+msgid "About"
+msgstr ""
+
+#: mgmeckern/apps/public/templates/public/home.html:4
+msgid "Report a problem"
+msgstr ""
+
+#: mgmeckern/apps/public/templates/public/home.html:14
+msgid "Recent Reports"
+msgstr ""
+
+#: mgmeckern/apps/public/templates/public/home.html:18
+#: mgmeckern/apps/report/models.py:14
+msgid "Address"
+msgstr ""
+
+#: mgmeckern/apps/public/templates/public/home.html:19
+#: mgmeckern/apps/report/models.py:13
+msgid "Comment"
+msgstr ""
+
+#: mgmeckern/apps/public/templates/public/home.html:20
+msgid "Level"
+msgstr ""
+
+#: mgmeckern/apps/report/__init__.py:7
+msgid "Critical"
+msgstr ""
+
+#: mgmeckern/apps/report/__init__.py:8
+msgid "Bad"
+msgstr ""
+
+#: mgmeckern/apps/report/__init__.py:9
+msgid "Irritating"
+msgstr ""
+
+#: mgmeckern/apps/report/forms.py:45
+msgid "Street Address..."
+msgstr ""
+
+#: mgmeckern/apps/report/models.py:12
+msgid "Email"
+msgstr ""
+
+#: mgmeckern/apps/report/models.py:12
+msgid "Your email address"
+msgstr ""
+
+#: mgmeckern/apps/report/models.py:13
+msgid "Your review of the problem"
+msgstr ""
+
+#: mgmeckern/apps/report/models.py:14
+msgid "The approximate address of the problem"
+msgstr ""
+
+#: mgmeckern/apps/report/models.py:15
+msgid "Severity"
+msgstr ""
+
+#: mgmeckern/apps/report/models.py:15
+msgid "How bad is the problem?"
+msgstr ""
+
+#: mgmeckern/apps/report/templates/report/map.html:14
+msgid "Where is the problem?"
+msgstr ""
+
+#: mgmeckern/apps/report/templates/report/map.html:15
+msgid ""
+"So you have found a problem that you think needs to be looked at or repaired?"
+msgstr ""
+
+#: mgmeckern/apps/report/templates/report/map.html:22
+msgid ""
+"Enter the street address or use the map to find the location of the problem "
+"you would like to report."
+msgstr ""
+
+#: mgmeckern/apps/report/templates/report/map.html:23
+msgid "Double cick the map to add a new report!"
+msgstr ""
