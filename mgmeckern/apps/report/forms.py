@@ -54,7 +54,7 @@ class AddressSearchForm(forms.Form):
         self.helper.layout = Layout(
             Div(
                 'q',
-                Button('btn-search-btn', 'Search', css_id='search-btn', css_class='btn btn-info input-lg'),
+                Button('btn-search-btn', _('Search'), css_id='search-btn', css_class='btn btn-info input-lg'),
                 #Field('q', css_class='form-control col-md-offset-6 input-lg'),
                 css_class='row '
             ),
