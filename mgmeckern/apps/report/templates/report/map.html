@@ -280,10 +280,12 @@ $(function() {
                     'css_severity': '{{ p.css_severity }}',
                 });
                 marker.pk = {{ p.pk }}; // used to identify it as "set"
-                marker.bindPopup(report_popupContent);
+
                 marker.addTo(self.map);
+                marker.bindPopup(report_popupContent);
                 marker.dragging.disable();
-                self.map.markers.push(marker);
+
+                self.map.markers.push(marker); // save the marker in a local set
                 self._log('Added pin {{ p.pk }} to map')
             {% endfor %}
 
