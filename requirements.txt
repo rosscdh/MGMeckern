@@ -6,7 +6,7 @@ django-debug-toolbar==0.10.2
 django-extensions==1.2.5
 django-geojson==2.1.1
 -e git+https://github.com/rosscdh/django-jsonfield.git@lawpal#egg=django_jsonfield
-django-leaflet==0.8.1
+-e git+https://github.com/rosscdh/django-leaflet.git#egg=django-leaflet
 django-parsley==0.1
 -e git+https://github.com/rosscdh/django-templatetag-handlebars.git#egg=django_templatetag_handlebars
 djangorestframework==2.3.8
