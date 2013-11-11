@@ -20,93 +20,94 @@ msgstr ""
 
 #: mgmeckern/settings.py:49
 msgid "German"
-msgstr ""
+msgstr "Deutsch"
 
 #: mgmeckern/settings.py:50
 msgid "English"
-msgstr ""
+msgstr "Englisch"
 
 #: mgmeckern/apps/public/templates/public/about.html:3
 msgid "About"
-msgstr ""
+msgstr "Impressum"
 
 #: mgmeckern/apps/public/templates/public/home.html:4
 msgid "Report a problem"
-msgstr ""
+msgstr "Problem melden"
 
 #: mgmeckern/apps/public/templates/public/home.html:14
 msgid "Recent Reports"
-msgstr ""
+msgstr "Aktuelle Berichte"
 
 #: mgmeckern/apps/public/templates/public/home.html:18
 #: mgmeckern/apps/report/models.py:14
 msgid "Address"
-msgstr ""
+msgstr "Adresse"
 
 #: mgmeckern/apps/public/templates/public/home.html:19
 #: mgmeckern/apps/report/models.py:13
 msgid "Comment"
-msgstr ""
+msgstr "Kommentar"
 
 #: mgmeckern/apps/public/templates/public/home.html:20
 msgid "Level"
-msgstr ""
+msgstr "Schwere"
 
 #: mgmeckern/apps/report/__init__.py:7
 msgid "Critical"
-msgstr ""
+msgstr "kritisch"
 
 #: mgmeckern/apps/report/__init__.py:8
 msgid "Bad"
-msgstr ""
+msgstr "schlecht"
 
 #: mgmeckern/apps/report/__init__.py:9
 msgid "Irritating"
-msgstr ""
+msgstr "nervig"
 
 #: mgmeckern/apps/report/forms.py:45
 msgid "Street Address..."
-msgstr ""
+msgstr "Straßen Adresse..."
 
 #: mgmeckern/apps/report/models.py:12
 msgid "Email"
-msgstr ""
+msgstr "E-Mail"
 
 #: mgmeckern/apps/report/models.py:12
 msgid "Your email address"
-msgstr ""
+msgstr "Ihre E-Mail-Adresse"
 
 #: mgmeckern/apps/report/models.py:13
 msgid "Your review of the problem"
-msgstr ""
+msgstr "Ihre Meinung zu dem Problem"
 
 #: mgmeckern/apps/report/models.py:14
 msgid "The approximate address of the problem"
-msgstr ""
+msgstr "Die ungefähre Adresse des Problems"
 
 #: mgmeckern/apps/report/models.py:15
 msgid "Severity"
-msgstr ""
+msgstr "Schwere"
 
 #: mgmeckern/apps/report/models.py:15
 msgid "How bad is the problem?"
-msgstr ""
+msgstr "Wie schlimm ist das Problem?"
 
 #: mgmeckern/apps/report/templates/report/map.html:14
 msgid "Where is the problem?"
 msgstr "Wo ist das Problem?"
 
 #: mgmeckern/apps/report/templates/report/map.html:15
-msgid ""
-"So you have found a problem that you think needs to be looked at or repaired?"
-msgstr ""
+msgid "So you have found a problem that you think needs to be looked at or repaired?"
+msgstr "Sie ein Problem, dass Sie denken, Bedürfnisse zu sah oder repariert werden gefunden?"
 
 #: mgmeckern/apps/report/templates/report/map.html:22
 msgid ""
 "Enter the street address or use the map to find the location of the problem "
 "you would like to report."
 msgstr ""
+"Geben Sie die Adresse oder die Karte, um den Standort des Problems zu finden"
+"Sie möchten zu berichten."
 
 #: mgmeckern/apps/report/templates/report/map.html:23
 msgid "Double cick the map to add a new report!"
-msgstr ""
+msgstr "Doppelklicken die Karte um einen neuen Bericht hinzufügen!"
