@@ -315,10 +315,13 @@ $(function() {
             map.on('add_marker', function ( e ) {
                 var marker = L.marker([e.lat, e.lon]);
                 var template = e.template;
+                var open = e.open || false;
 
                 marker.addTo(this)
-                      .bindPopup(template)
-                      .openPopup();
+                      .bindPopup(template);
+                if ( open === true ) {
+                    marker.openPopup();
+                }
 
                 self._log('Added pin to map')
             });
