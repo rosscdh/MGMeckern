@@ -22,7 +22,7 @@ class ReportForm(forms.ModelForm):
 
     class Meta:
         model = Report
-        exclude = ('is_deleted')
+        exclude = ('is_deleted',)
 
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
