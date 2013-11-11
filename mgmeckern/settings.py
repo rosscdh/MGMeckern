@@ -106,7 +106,6 @@ SECRET_KEY = 'sxtso-ceubz-6xq1hd!&p=q%9n4$9!e!$qk+m*8^z9_dfqg-j-'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -136,7 +135,6 @@ DJANGO_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #'django.contrib.gis',
     'django.contrib.admin',
     'django.contrib.humanize',
 )

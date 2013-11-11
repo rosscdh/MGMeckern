@@ -1,4 +1,4 @@
-{% load i18n leaflet_tags crispy_forms_tags templatetag_handlebars %}
+{% load i18n leaflet_tags crispy_forms_tags templatetag_handlebars l10n %}
 
 <style>
     div.leaflet-control-geosearch {
@@ -268,34 +268,28 @@ $(function() {
 
             self.map.doubleClickZoom.disable();
 
+            // setup the map listeners
+            self._map_listen(map);
+
             // Add marker pins for existing events
             // @TODO this wil need to become a rest call eventually
             {% for p in pins %}
-                marker = L.marker([{{ p.lat }}, {{ p.lon }}]);
-
                 var report_popupContent = self.templates.report({
                     'comment': '{{ p.comment|escapejs }}',
                     'date_modified': '{{ p.date_modified }}',
                     'display_severity': '{{ p.display_severity }}',
                     'css_severity': '{{ p.css_severity }}',
                 });
-                marker.pk = {{ p.pk }}; // used to identify it as "set"
 
-                marker.addTo(self.map);
-                marker.bindPopup(report_popupContent);
-                marker.dragging.disable();
+                {% localize off %}
+                self.map.fireEvent( "add_marker", {lat: '{{ p.lat }}', lon: '{{ p.lon }}', template: report_popupContent} );
+                {% endlocalize %}
 
-                self.map.markers.push(marker); // save the marker in a local set
-                self._log('Added pin {{ p.pk }} to map')
             {% endfor %}
 
             // Geo Search
             self.geo_search = self.geosearch_provider();
             self.geo_search.addTo(self.map);
-
-
-            // setup the map listeners
-            self._map_listen(map);
         },
         /**
         * Listeners that are specific to our map instance
@@ -316,6 +310,17 @@ $(function() {
                 self.current_marker = marker;
 
                 $('body').trigger('populate_report_form', [map, latlng, marker]);
+            });
+
+            map.on('add_marker', function ( e ) {
+                var marker = L.marker([e.lat, e.lon]);
+                var template = e.template;
+
+                marker.addTo(this)
+                      .bindPopup(template)
+                      .openPopup();
+
+                self._log('Added pin to map')
             });
 
             /**
