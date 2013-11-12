@@ -17,7 +17,7 @@ USE_EMAIL_QUEUE = getattr(settings, 'USE_EMAIL_QUEUE', False)
 
 
 def send_mailout(report, from_email, recipients, language):
-    translation.activate(language)
+    translation.activate(getattr(settings, 'LANGUAGE_CODE', 'en'))
 
     send_templated_mail(
             template_name='new_report',

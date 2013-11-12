@@ -166,6 +166,8 @@ else:
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
+USE_EMAIL_QUEUE = os.environ.get('USE_EMAIL_QUEUE', False)
+
 #
 # Templated Email
 #
