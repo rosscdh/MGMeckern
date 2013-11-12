@@ -42,8 +42,8 @@ def on_new_report(sender, **kwargs):
     language = translation.get_language()
 
     if is_new is True:
-        try:
-            django_rq.enqueue(send_mailout, report, FROM_EMAIL, settings.MANAGERS, language)
-        except:
-            # send locally
-            send_mailout(report, FROM_EMAIL, settings.MANAGERS, language)
+        # try:
+        #     django_rq.enqueue(send_mailout, report, FROM_EMAIL, settings.MANAGERS, language)
+        # except:
+        # send locally
+        send_mailout(report, FROM_EMAIL, settings.MANAGERS, language)
