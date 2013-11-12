@@ -13,6 +13,7 @@ import django_rq
 logger = logging.getLogger('django.request')
 
 NAME, FROM_EMAIL = settings.ADMINS[0]
+USE_EMAIL_QUEUE = getattr(settings, 'USE_EMAIL_QUEUE', False)
 
 
 def send_mailout(report, from_email, recipients, language):
@@ -42,8 +43,15 @@ def on_new_report(sender, **kwargs):
     language = translation.get_language()
 
     if is_new is True:
-        # try:
-        #     django_rq.enqueue(send_mailout, report, FROM_EMAIL, settings.MANAGERS, language)
-        # except:
-        # send locally
-        send_mailout(report, FROM_EMAIL, settings.MANAGERS, language)
+
+        if USE_EMAIL_QUEUE is False:
+            send_mailout(report, FROM_EMAIL, settings.MANAGERS, language)
+
+        else:
+
+            try:
+                django_rq.enqueue(send_mailout, report, FROM_EMAIL, settings.MANAGERS, language)
+            except Exception as e:
+                logger.error('An Exception occurred trying to send email asynchronously: %s' % e)
+                # send locally
+                send_mailout(report, FROM_EMAIL, settings.MANAGERS, language)
