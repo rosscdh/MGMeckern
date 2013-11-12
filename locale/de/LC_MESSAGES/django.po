@@ -80,7 +80,7 @@ msgstr "Wie schlimm ist das Problem?"
 
 #: templates/email/new_report.email:1
 msgid "A new Report has been lodged"
-msgstr ""
+msgstr "[altatadtlabor] Melder - neuer Eintrag"
 
 #: templates/email/new_report.email:3
 msgid ""

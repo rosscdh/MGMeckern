@@ -18,7 +18,9 @@ ADMINS = (
     ("Ross Crawford-'dHeureuse", 'sendrossemail@gmail.com'),
 )
 
-MANAGERS = ADMINS
+MANAGERS = ADMINS + (
+    ("Stephano Picco", 's.picco@spicone.de'),
+)
 
 db_config = {
     'ENGINE': 'django.db.backends.sqlite3',
@@ -236,8 +238,8 @@ LOGGING = {
 CRISPY_TEMPLATE_PACK = 'crispy/bootstrap3'
 
 LEAFLET_CONFIG = {
-    'DEFAULT_CENTER': (51.2000, 6.4333),
-    'DEFAULT_ZOOM': 11,
+    'DEFAULT_CENTER': (51.19480, 6.42990),
+    'DEFAULT_ZOOM': 17,
     'PLUGINS': {
         'GeoSearch': {
             'css': ['https://raw.github.com/smeijer/L.GeoSearch/master/src/css/l.geosearch.css'],
