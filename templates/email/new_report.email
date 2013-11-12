@@ -1,16 +1,16 @@
-{% block subject %}A new Report has been lodged{% endblock %}
+{% load i18n %}{% block subject %}{% trans 'A new Report has been lodged' %}{% endblock %}
 
-{% block plain %}{% spaceless %}
+{% block plain %}{% spaceless %}{% blocktrans %}
 Hi there,
 
-A new problem has been lodged.
+A new problem has been lodged.{% endblocktrans %}
 
-Date: {{ date_created }}
-From: {{ email }}
-Severity: {{ severity }}
-{% if address %}Address: {{ address }}{% endif %}
+{% trans 'Date:' %} {{ date_created }}
+{% trans 'From:' %} {{ email }}
+{% trans 'Severity:' %} {{ severity }}
+{% if address %}{% trans 'Address:' %} {{ address }}{% endif %}
 
-Comment
+{% trans 'Comment' %}
 ---------------
 {{ comment }}
 
