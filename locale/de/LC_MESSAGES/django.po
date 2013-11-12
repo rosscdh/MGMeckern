@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-09 12:17+0100\n"
+"POT-Creation-Date: 2013-11-12 09:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,32 +26,6 @@ msgstr "Deutsch"
 msgid "English"
 msgstr "Englisch"
 
-#: mgmeckern/apps/public/templates/public/about.html:3
-msgid "About"
-msgstr "Impressum"
-
-#: mgmeckern/apps/public/templates/public/home.html:4
-msgid "Report a problem"
-msgstr "Problem melden"
-
-#: mgmeckern/apps/public/templates/public/home.html:14
-msgid "Recent Reports"
-msgstr "Aktuelle Berichte"
-
-#: mgmeckern/apps/public/templates/public/home.html:18
-#: mgmeckern/apps/report/models.py:14
-msgid "Address"
-msgstr "Adresse"
-
-#: mgmeckern/apps/public/templates/public/home.html:19
-#: mgmeckern/apps/report/models.py:13
-msgid "Comment"
-msgstr "Kommentar"
-
-#: mgmeckern/apps/public/templates/public/home.html:20
-msgid "Level"
-msgstr "Schwere"
-
 #: mgmeckern/apps/report/__init__.py:7
 msgid "Critical"
 msgstr "kritisch"
@@ -68,6 +42,10 @@ msgstr "nervig"
 msgid "Street Address..."
 msgstr "Straßen Adresse..."
 
+#: mgmeckern/apps/report/forms.py:57
+msgid "Search"
+msgstr ""
+
 #: mgmeckern/apps/report/models.py:12
 msgid "Email"
 msgstr "E-Mail"
@@ -76,9 +54,17 @@ msgstr "E-Mail"
 msgid "Your email address"
 msgstr "Ihre E-Mail-Adresse"
 
+#: mgmeckern/apps/report/models.py:13 templates/email/new_report.email:13
+msgid "Comment"
+msgstr "Kommentar"
+
 #: mgmeckern/apps/report/models.py:13
 msgid "Your review of the problem"
 msgstr "Ihre Meinung zu dem Problem"
+
+#: mgmeckern/apps/report/models.py:14
+msgid "Address"
+msgstr "Adresse"
 
 #: mgmeckern/apps/report/models.py:14
 msgid "The approximate address of the problem"
@@ -92,22 +78,68 @@ msgstr "Schwere"
 msgid "How bad is the problem?"
 msgstr "Wie schlimm ist das Problem?"
 
-#: mgmeckern/apps/report/templates/report/map.html:14
-msgid "Where is the problem?"
-msgstr "Wo ist das Problem?"
-
-#: mgmeckern/apps/report/templates/report/map.html:15
-msgid "So you have found a problem that you think needs to be looked at or repaired?"
-msgstr "Sie ein Problem, dass Sie denken, Bedürfnisse zu sah oder repariert werden gefunden?"
-
-#: mgmeckern/apps/report/templates/report/map.html:22
-msgid ""
-"Enter the street address or use the map to find the location of the problem "
-"you would like to report."
+#: templates/email/new_report.email:1
+msgid "A new Report has been lodged"
 msgstr ""
-"Geben Sie die Adresse oder die Karte, um den Standort des Problems zu finden"
-"Sie möchten zu berichten."
 
-#: mgmeckern/apps/report/templates/report/map.html:23
-msgid "Double cick the map to add a new report!"
-msgstr "Doppelklicken die Karte um einen neuen Bericht hinzufügen!"
+#: templates/email/new_report.email:3
+msgid ""
+"\n"
+"Hi there,\n"
+"\n"
+"A new problem has been lodged."
+msgstr ""
+"\n"
+"Guten Tag,\n"
+"\n"
+"Ein neuen problem ist gemeldet."
+
+#: templates/email/new_report.email:8
+msgid "Date:"
+msgstr "Datum:"
+
+#: templates/email/new_report.email:9
+msgid "From:"
+msgstr "Von:"
+
+#: templates/email/new_report.email:10
+#, fuzzy
+msgid "Severity:"
+msgstr "Schwere"
+
+#: templates/email/new_report.email:11
+#, fuzzy
+msgid "Address:"
+msgstr "Adresse"
+
+#~ msgid "About"
+#~ msgstr "Impressum"
+
+#~ msgid "Report a problem"
+#~ msgstr "Problem melden"
+
+#~ msgid "Recent Reports"
+#~ msgstr "Aktuelle Berichte"
+
+#~ msgid "Level"
+#~ msgstr "Schwere"
+
+#~ msgid "Where is the problem?"
+#~ msgstr "Wo ist das Problem?"
+
+#~ msgid ""
+#~ "So you have found a problem that you think needs to be looked at or "
+#~ "repaired?"
+#~ msgstr ""
+#~ "Sie ein Problem, dass Sie denken, Bedürfnisse zu sah oder repariert "
+#~ "werden gefunden?"
+
+#~ msgid ""
+#~ "Enter the street address or use the map to find the location of the "
+#~ "problem you would like to report."
+#~ msgstr ""
+#~ "Geben Sie die Adresse oder die Karte, um den Standort des Problems zu "
+#~ "findenSie möchten zu berichten."
+
+#~ msgid "Double cick the map to add a new report!"
+#~ msgstr "Doppelklicken die Karte um einen neuen Bericht hinzufügen!"
