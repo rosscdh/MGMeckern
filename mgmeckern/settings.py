@@ -152,6 +152,7 @@ HELPER_APPS = (
     'leaflet',
     'templatetag_handlebars',
     'rest_framework',
+    'django_rq',
 )
 
 INSTALLED_APPS = DJANGO_APPS + HELPER_APPS + PROJECT_APPS
@@ -176,6 +177,14 @@ if 'SENDGRID_USERNAME' in os.environ:
     EMAIL_HOST= 'smtp.sendgrid.net'
     EMAIL_PORT = 587
     EMAIL_USE_TLS = True
+
+
+RQ_QUEUES = {
+    'default': {
+        'URL': os.getenv('REDISTOGO_URL', 'redis://redistogo:49e729e96ed0a9d01796661836a54bf4@jack.redistogo.com:9735'),
+        'DB': 0,
+    }
+}
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -212,6 +221,11 @@ LOGGING = {
             'propagate': True,
         },
         'django.request': {
+            'handlers': ['console', 'logfile'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'worker': {
             'handlers': ['console', 'logfile'],
             'level': 'DEBUG',
             'propagate': True,

@@ -19,6 +19,7 @@ markdown
 dj-database-url
 dj_static
 django-templated-email
+django-rq # requeue for queue tasks
 
 # folium maps ntegation with leafletjs
 # not used
