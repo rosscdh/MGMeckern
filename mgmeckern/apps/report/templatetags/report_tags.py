@@ -2,21 +2,20 @@
 from django import template
 from django.core.urlresolvers import reverse
 
-from mgmeckern.apps.report.models import Report
-from mgmeckern.apps.report.forms import AddressSearchForm, ReportForm
+from mgmeckern.apps.report.forms import ReportForm
 
 register = template.Library()
 
 
 @register.inclusion_tag('report/map.html', takes_context=True)
-def report_map(context):
+def report_map(context, map_selector, callback='window.map_init_basic'):
 
     context.update({
-        'search_form': AddressSearchForm(),
+        'map_selector': map_selector,
+        'map_init_callback': callback,
         'report_form': ReportForm(),
         #'report_api_url': '/api/v1/report/',
-        'report_api_url': reverse('report:create'),
-        'pins': Report.objects.active(),
+        'report_api_url': reverse('report:create')
     })
 
     if 'map_name' not in context:

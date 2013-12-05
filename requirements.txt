@@ -25,6 +25,7 @@ django-rq # requeue for queue tasks
 pillow
 django-storages
 easy-thumbnails
+django-jsonify
 
 # folium maps ntegation with leafletjs
 # not used

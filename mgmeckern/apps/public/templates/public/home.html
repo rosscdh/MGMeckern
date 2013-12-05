@@ -1,12 +1,22 @@
-{% extends 'base.html' %}{% load i18n report_tags thumbnail %}
+{% extends 'base.html' %}{% load url from future %}{% load i18n report_tags leaflet_tags crispy_forms_tags templatetag_handlebars l10n thumbnail jsonify %}
+
 
 {% block page_title %}{% trans 'Report a problem' %}{% endblock %}
 
 {% block prebody %}
-    {% report_map %}
+    <div class="container">
+        <div class="page-header text-center">
+            <h2>{% trans 'Where is the problem?' %}</h2>
+        </div>
+        {% crispy search_form %}
+    </div>
+
+    {% report_map 'mgmeckern-map' 'window.map_init_basic' %}
+
 {% endblock %}
 
 {% block content %}
+
 {% comment %}
 <div class="row">
     <p>&nbsp;</p>
@@ -35,4 +45,36 @@
     </table>
 </div>
 {% endcomment %}
+{% endblock %}
+
+{% block js %}
+<script>
+/**
+* Callback called by leaf js when the map is loaded
+*/
+function map_init_basic (map, options) {
+    // initialize our map
+    $('#mgmeckern-map').map_control({
+            'map':map,
+            'map_options': options,
+            'create_report_url': '{{ report_api_url }}',
+            'pins': {{ pins|jsonify }}
+    });
+}
+
+$(document).ready(function(){
+
+    $('#div_id_q').addClass('col-md-10');
+
+    $('form#frm-address-search').keypress( function ( e ) {
+        if ( e.keyCode == 10 || e.keyCode == 13 ) {
+            e.preventDefault();
+            e.stopPropagation();
+            // trigger the search click event
+            window.map_control.options.search_btn.trigger('click');
+        }
+    });
+
+});
+</script>
 {% endblock %}

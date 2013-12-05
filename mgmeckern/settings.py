@@ -152,6 +152,7 @@ HELPER_APPS = (
     'crispy_forms',
     'parsley',
     'leaflet',
+    'jsonify',
     'templatetag_handlebars',
     'rest_framework',
     'easy_thumbnails',
