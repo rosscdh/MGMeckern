@@ -161,25 +161,33 @@ $(function() {
 
                 $('#id_report_form_create').on('load', function ( e ) {
                     // set the self iframe
+                    self._log('loaded iframe')
+
                     self.iframe = $(this).contents();
+                    try {
+                        var json = $.parseJSON(self.iframe.text());
+                        $('body').trigger( "form_submitted", [json] )
 
-                    var address = (self.entered_data.id_address || self.options.q.val() || null);
+                    } catch ( e ) {
+                        var json = false;
+                        var address = (self.entered_data.id_address || self.options.q.val() || null);
 
-                    if ( address === null) {
-                        self.iframe.find('#div_id_address:first').hide(); // hide the outer parent row
-                        self.iframe.find('#id_address:first').val( '' );
-                    } else {
-                        self.iframe.find('#div_id_address:first').show(); // show the outer parent row
-                        self.iframe.find('#id_address:first').val( address );
+                        if ( address === null) {
+                            self.iframe.find('#div_id_address:first').hide(); // hide the outer parent row
+                            self.iframe.find('#id_address:first').val( '' );
+                        } else {
+                            self.iframe.find('#div_id_address:first').show(); // show the outer parent row
+                            self.iframe.find('#id_address:first').val( address );
+                        }
+
+                        self.iframe.find('#id_comment:first').val( self.entered_data.id_comment || '');
+                        self.iframe.find('#id_email:first').val( self.entered_data.id_email || '');
+                        self.iframe.find('#id_lat:first').val(latlng.lat.toFixed(15));
+                        self.iframe.find('#id_lon:first').val(latlng.lng.toFixed(15));
+
+                        // setup fhe form
+                        $('body').trigger( "form_init", [map, latlng, marker] )
                     }
-
-                    self.iframe.find('#id_comment:first').val( self.entered_data.id_comment || '');
-                    self.iframe.find('#id_email:first').val( self.entered_data.id_email || '');
-                    self.iframe.find('#id_lat:first').val(latlng.lat.toFixed(15));
-                    self.iframe.find('#id_lon:first').val(latlng.lng.toFixed(15));
-
-                    // setup fhe form
-                    $('body').trigger( "form_init", [map, latlng, marker] )
                 })// end iframe load
 
             });
@@ -197,7 +205,25 @@ $(function() {
                     self.entered_data[elem.attr('id')] = elem.val();
                 });
 
+                form.on('submit', function ( e ) {
+                    console.log(self.iframe)
+                })
+
             });
+
+            $('body').on( "form_submitted", function ( event, json ) {
+                // ok so we have a winner
+                self.current_marker.closePopup();
+                var pk = json.id
+                // update with nice template json
+                var popup = L.popup().setContent(self.templates.report(json))
+                // bind to the new popup
+                self.current_marker.bindPopup(popup, {minWidth: 300});
+                // now open it
+                self.current_marker.openPopup();
+                // reset json
+                self.entered_data = {};
+            })
 
             /**
             * button controls

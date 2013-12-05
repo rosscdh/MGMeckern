@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.template.defaultfilters import slugify
 
 from . import SEVERITY_CHOICES
 from .managers import ReportManager
@@ -10,8 +11,7 @@ import os
 
 def _report_upload_path(instance, filename):
     _, ext = os.path.splitext(filename)
-    import pdb;pdb.set_trace()
-    return 'report/%s-%s%s' % (instance.lat, instance.lon, ext)
+    return 'report/%s-%s-%s%s' % (slugify(instance.email), instance.lat, instance.lon, ext)
 
 
 class Report(models.Model):
