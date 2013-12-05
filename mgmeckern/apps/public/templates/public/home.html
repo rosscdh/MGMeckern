@@ -15,40 +15,11 @@
 
 {% endblock %}
 
-{% block content %}
-
-{% comment %}
-<div class="row">
-    <p>&nbsp;</p>
-    <p>&nbsp;</p>
-    <h3>{% trans 'Recent Reports' %}</h3>
-    <table class="table">
-    <thead>
-      <tr>
-        <th>{% trans 'Address' %}</th>
-        <th>{% trans 'Comment' %}</th>
-        <th>{% trans 'Level' %}</th>
-      </tr>
-    </thead>
-    <tbody>
-        {% for r in reports %}
-        <tr>
-            <td>{{ r.address }}</td>
-            <td>
-                <blockquote>{{ r.comment|truncatewords:15 }}<small>{{ r.date_modified }}</small></blockquote>
-                <img src="{% thumbnail r.photo 50x50 crop %}" border="0"/>
-            </td>
-            <td><span class="label {{ r.css_severity }}">{{ r.display_severity }}</div></td>
-        </tr>
-        {% endfor %}
-    </tbody>
-    </table>
-</div>
-{% endcomment %}
-{% endblock %}
+{% block content %}{% endblock %}
 
 {% block js %}
-<script>
+<script type="text/javascript">
+'use strict';
 /**
 * Callback called by leaf js when the map is loaded
 */
@@ -63,6 +34,20 @@ function map_init_basic (map, options) {
 }
 
 $(document).ready(function(){
+
+    if (navigator.geolocation) {
+        // if we support geoloc and the user allows it
+        navigator.geolocation.getCurrentPosition(function ( pos ) {
+            // got it, set the maps position
+            var lat = pos.coords.latitude;
+            var lon = pos.coords.longitude
+            window.map_control.map.panTo([lat, lon]);
+        },
+        // error
+        function ( e ) {
+
+        });
+    }
 
     $('#div_id_q').addClass('col-md-10');
 
