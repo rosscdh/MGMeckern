@@ -1,11 +1,14 @@
 # -*- coding: UTF-8 -*-
 from django import forms
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 
+
 from parsley.decorators import parsleyfy
+
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Div, Submit, HTML, ButtonHolder, Button, Row, Field
-from crispy_forms.bootstrap import AppendedText, PrependedText, FormActions
+from crispy_forms.layout import Layout, Div, HTML, Button, Submit
+from crispy_forms.bootstrap import AppendedText, PrependedText, FormActions, InlineRadios
 
 from . import SEVERITY_CHOICES
 from .models import Report
@@ -16,6 +19,7 @@ class ReportForm(forms.ModelForm):
     """
     Public Form for the report model
     """
+    comment = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}))
     severity = forms.ChoiceField(choices=SEVERITY_CHOICES.get_choices(), initial=0, widget=forms.RadioSelect)
     lat = forms.CharField(widget=forms.HiddenInput)
     lon = forms.CharField(widget=forms.HiddenInput)
@@ -27,15 +31,21 @@ class ReportForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
         self.helper.form_id = 'frm-create-report'
-        self.helper.form_class = 'parsley'
+        self.helper.form_action = reverse('report:create')
+
+        self.helper.form_class = 'form form-horizontal parsley'
+        self.helper.label_class = 'col-lg-2'
+        self.helper.field_class = 'col-lg-8'
+
         self.helper.layout = Layout(
-            'email',
+            PrependedText('email', '@'),
             'comment',
             'address',
-            'severity',
+            InlineRadios('severity'),
+            'photo',
             'lat',
             'lon',
-            Button('btn-send-report', 'Report', css_id='id_btn-send-report', css_class='btn-send-report btn btn-warning'),
+            Submit('btn-send-report', 'Report', css_id='id_btn-send-report', css_class='btn-send-report btn btn-warning'),
         )
         super(ReportForm, self).__init__(*args, **kwargs)
 

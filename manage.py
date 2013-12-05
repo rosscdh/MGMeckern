@@ -17,6 +17,7 @@ if __name__ == "__main__":
         with open(env_var, 'r') as env_var_file:
             os.environ.setdefault(env_var.split(os.sep)[-1],
                                   env_var_file.read().strip())
+            print '%s=%s' % (env_var, env_var_file.read(),)
 
     from django.core.management import execute_from_command_line
 

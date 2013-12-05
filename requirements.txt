@@ -1,4 +1,4 @@
-Django==1.5.5
+Django
 South==0.8.2
 Werkzeug==0.9.4
 django-crispy-forms==1.4.0
@@ -20,6 +20,11 @@ dj-database-url
 dj_static
 django-templated-email
 django-rq # requeue for queue tasks
+
+# images
+pillow
+django-storages
+easy-thumbnails
 
 # folium maps ntegation with leafletjs
 # not used

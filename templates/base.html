@@ -15,6 +15,12 @@
       <script src="{{ STATIC_URL }}js/html5shiv.js"></script>
       <script src="{{ STATIC_URL }}js/respond.min.js"></script>
     <![endif]-->
+    <style>
+    html,body{
+      height:100%;
+    }
+    </style>
+    {% block css %}{% endblock %}
   </head>
   <body>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -24,24 +30,6 @@
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.0.0/handlebars.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/parsley.js/1.1.16/parsley.min.js"></script>
 
-<!--       <div class="navbar navbar-default navbar-static-top">
-          <div class="navbar-header">
-              <button type="button" data-toggle="collapse" data-target=".navbar-collapse" class="navbar-toggle">
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-              </button>
-              <a href="/" class="navbar-brand">Mönchengladbach - Meckern</a>
-          </div>
-          <div>
-              <ul class="nav navbar-nav">
-                  <li>
-                      <a href="{% url 'public:about' %}"><div class="icon-flag">About</div></a>
-                  </li>
-              </ul>
-          </div>
-      </div> -->
-
     {% block prebody %}{% endblock %}
     <div class="container">{% block content %}{% endblock %}</div>
 
@@ -49,5 +37,6 @@
     <script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
     
     {% leaflet_js %}
+    {% block js %}{% endblock %}
   </body>
 </html>

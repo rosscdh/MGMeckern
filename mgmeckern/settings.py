@@ -154,6 +154,7 @@ HELPER_APPS = (
     'leaflet',
     'templatetag_handlebars',
     'rest_framework',
+    'easy_thumbnails',
     'django_rq',
 )
 
@@ -237,7 +238,7 @@ LOGGING = {
     }
 }
 
-CRISPY_TEMPLATE_PACK = 'crispy/bootstrap3'
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 LEAFLET_CONFIG = {
     'DEFAULT_CENTER': (51.19480, 6.42990),

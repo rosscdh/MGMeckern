@@ -1,1 +1,1 @@
-django.core.mail.backends.smtp.EmailBackend
+django.core.mail.backends.console.EmailBackend

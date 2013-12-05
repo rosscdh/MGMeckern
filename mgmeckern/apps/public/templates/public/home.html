@@ -1,5 +1,4 @@
-{% extends 'base.html' %}
-{% load i18n report_tags %}
+{% extends 'base.html' %}{% load i18n report_tags thumbnail %}
 
 {% block page_title %}{% trans 'Report a problem' %}{% endblock %}
 
@@ -24,7 +23,10 @@
         {% for r in reports %}
         <tr>
             <td>{{ r.address }}</td>
-            <td><blockquote>{{ r.comment|truncatewords:15 }}<small>{{ r.date_modified }}</small></blockquote></td>
+            <td>
+                <blockquote>{{ r.comment|truncatewords:15 }}<small>{{ r.date_modified }}</small></blockquote>
+                <img src="{% thumbnail r.photo 50x50 crop %}" border="0"/>
+            </td>
             <td><span class="label {{ r.css_severity }}">{{ r.display_severity }}</div></td>
         </tr>
         {% endfor %}

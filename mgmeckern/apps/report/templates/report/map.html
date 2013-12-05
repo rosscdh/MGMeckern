@@ -1,11 +1,15 @@
-{% load i18n leaflet_tags crispy_forms_tags templatetag_handlebars l10n %}
+{% load url from future %}{% load i18n leaflet_tags crispy_forms_tags templatetag_handlebars l10n thumbnail %}
 
 <style>
     div.leaflet-control-geosearch {
         display:none;
     }
     div#mg_meckern {
-        min-height:460px;
+        min-height:550px;
+    }
+    iframe#id_report_form_create{
+        width:100%;
+        height:100%;
     }
 </style>
 
@@ -31,12 +35,21 @@
 </div>
 
 {% tplhandlebars "tpl-report_form" %}
-    {% crispy report_form %}
+    {#% crispy report_form %#}
+    <iframe id="id_report_form_create" src="{% url 'report:create' %}" frameborder="0" style="margin:0px;height:460px"></iframe>
 {% endtplhandlebars %}
 
 {% tplhandlebars "tpl-report" %}
-<div class="label {{ css_severity }} pull-right">{{ display_severity }}</div>
-<blockquote>{{ comment }}<small>{{ date_modified }}</small></blockquote>
+<div class="row">
+    <div class="label {{ css_severity }} pull-right">{{ display_severity }}</div>
+</div>
+<div class="row">
+    <blockquote>
+        <img class="pull-right" src="{{ photo }}" border="0"/>
+        {{ comment }}
+        <small>{{ date_modified }}</small>
+    </blockquote>
+</div>
 {% endtplhandlebars %}
 
 <script type="text/javascript">
@@ -54,6 +67,7 @@ $(function() {
         current_marker: null,  // the currently selected marker - as leaf does not seem to prvide a way to get a popups bound marker
         report_form_popup: null, // the popup that consistenly provides the form
         entered_data: {},
+        iframe: null,
         // templates
         templates: {
             'report_form': null,
@@ -81,6 +95,8 @@ $(function() {
         _create: function () {
             var self = this;
             self._log('creating')
+
+            self.iframe = $('#id_report_form_create').contents();
 
             self.set_templates();
             self._controls();
@@ -143,72 +159,44 @@ $(function() {
             $('body').on( "populate_report_form", function( event, map, latlng, marker ) {
                 self._log('populate_report_form');
 
-                var address = (self.entered_data.id_address || self.options.q.val() || null);
+                $('#id_report_form_create').on('load', function ( e ) {
+                    // set the self iframe
+                    self.iframe = $(this).contents();
 
-                if ( address === null) {
-                    $('#div_id_address:first').hide(); // hide the outer parent row
-                    $('#id_address:first').val( '' );
-                } else {
-                    $('#div_id_address:first').show(); // show the outer parent row
-                    $('#id_address:first').val( address );
-                }
+                    var address = (self.entered_data.id_address || self.options.q.val() || null);
 
-                $('#id_comment:first').val( self.entered_data.id_comment || '');
-                $('#id_email:first').val( self.entered_data.id_email || '');
-                $('#id_lat:first').val(latlng.lat.toFixed(15));
-                $('#id_lon:first').val(latlng.lng.toFixed(15));
+                    if ( address === null) {
+                        self.iframe.find('#div_id_address:first').hide(); // hide the outer parent row
+                        self.iframe.find('#id_address:first').val( '' );
+                    } else {
+                        self.iframe.find('#div_id_address:first').show(); // show the outer parent row
+                        self.iframe.find('#id_address:first').val( address );
+                    }
 
-                // setup fhe form
-                $('body').trigger( "form_init", [map, latlng, marker] )
+                    self.iframe.find('#id_comment:first').val( self.entered_data.id_comment || '');
+                    self.iframe.find('#id_email:first').val( self.entered_data.id_email || '');
+                    self.iframe.find('#id_lat:first').val(latlng.lat.toFixed(15));
+                    self.iframe.find('#id_lon:first').val(latlng.lng.toFixed(15));
+
+                    // setup fhe form
+                    $('body').trigger( "form_init", [map, latlng, marker] )
+                })// end iframe load
+
             });
 
             // form initialization and parslification
             $('body').on( "form_init", function( event, map, latlng, marker ) {
                 self._log('report form_init');
 
-                var form = $( '#frm-create-report' );
-                form.parsley();
+                var form = self.iframe.find( '#frm-create-report' );
+                //form.parsley();
 
-                $('#frm-create-report textarea').on('change', function ( e ) {
+                form.find('#frm-create-report textarea').on('change', function ( e ) {
                     console.log('settings value')
                     var elem = $(e.target);
                     self.entered_data[elem.attr('id')] = elem.val();
                 });
 
-                // stop the ormal form submit action from happening
-                $("#frm-create-report").off('submit').on('submit', function ( e ) {
-                    console.log('form submit: frm-create-report')
-                    e.preventDefault();
-                    e.stopPropagation();
-                });
-
-                $('#id_btn-send-report').off('click').on("click", function ( e ) {
-                    e.preventDefault();
-
-                    self._log('send report')
-
-                    if ( form.parsley( 'validate' ) === true ) {
-                        $.ajax({
-                            type: 'POST',
-                            url: self.options.create_report_url,
-                            data: form.serialize(),
-                            context: this,
-                            success: function(data, status) {
-                                // ok so we have a winner
-                                self.current_marker.closePopup();
-                                var pk = data.id
-                                // update with nice template data
-                                var popup = L.popup().setContent(self.templates.report(data))
-                                // bind to the new popup
-                                self.current_marker.bindPopup(popup);
-                                // now open it
-                                self.current_marker.openPopup();
-                                // reset data
-                                self.entered_data = {};
-                            }
-                        });
-                    }
-                });
             });
 
             /**
@@ -248,8 +236,8 @@ $(function() {
         init_report_form_popup: function () {
             var self = this;
             return L.popup({ 
-                        minWidth: 400,
-                        maxWidth: 450
+                        minWidth: 600,
+                        maxWidth: 640
                     })
                     .setContent(
                         self.templates.report_form({}) // init the basic form template
@@ -276,6 +264,7 @@ $(function() {
             {% for p in pins %}
                 var report_popupContent = self.templates.report({
                     'comment': '{{ p.comment|escapejs }}',
+                    'photo': '{% if p.photo %}{% thumbnail p.photo 75x75 crop %}{% endif %}',
                     'date_modified': '{{ p.date_modified }}',
                     'display_severity': '{{ p.display_severity }}',
                     'css_severity': '{{ p.css_severity }}',
@@ -318,7 +307,7 @@ $(function() {
                 var open = e.open || false;
 
                 marker.addTo(this)
-                      .bindPopup(template);
+                      .bindPopup(template, {minWidth: 300});
                 if ( open === true ) {
                     marker.openPopup();
                 }

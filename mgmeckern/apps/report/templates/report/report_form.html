@@ -1,15 +1,8 @@
-{% extends 'base.html' %}
-{% load url from future %}
-{% load i18n crispy_forms_tags report_tags %}
+{% extends 'base.html' %}{% load url from future %}{% load i18n crispy_forms_tags report_tags %}
 
-{% block page_title %}{% endblock %}
-
-{% block prebody %}<div class="jumbotron">
-{% report_map %}
-</div>{% endblock %}
+{% block page_title %}{% trans 'Create a new Report' %}{% endblock %}
 
 {% block content %}
-
-{% crispy form %}
-
+    {{ form.errors }}
+    {% crispy form %}
 {% endblock %}
