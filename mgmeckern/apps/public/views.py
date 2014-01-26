@@ -13,9 +13,10 @@ class PublicHomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(PublicHomeView, self).get_context_data(**kwargs)
+        active_reports = Report.objects.active()
         context.update({
-            'reports': Report.objects.active(),
+            'reports': active_reports,
             'search_form': AddressSearchForm(),
-            'pins': [ReportSerializer(r).data for r in Report.objects.active()]
+            'pins': [ReportSerializer(r).data for r in active_reports]
         })
         return context

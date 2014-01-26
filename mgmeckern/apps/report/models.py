@@ -3,6 +3,8 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import slugify
 
+from easy_thumbnails.files import get_thumbnailer
+
 from . import SEVERITY_CHOICES
 from .managers import ReportManager
 
@@ -44,6 +46,15 @@ class Report(models.Model):
     @property
     def latlng(self):
         return (self.lat, self.lon)
+
+    @property
+    def photo_url(self):
+        if self.photo_is_public is False:
+            return '//placehold.it/75x75'
+        else:
+            thumbnail_options = {'crop': True, 'size': (75, 75)}
+            thumbnailer = get_thumbnailer(self.photo)
+            return thumbnailer.get_thumbnail(thumbnail_options).url
 
     @property
     def display_severity(self):

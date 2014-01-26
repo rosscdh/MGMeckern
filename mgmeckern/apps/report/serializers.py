@@ -2,8 +2,6 @@
 from django.conf import settings
 from rest_framework import serializers
 
-from easy_thumbnails.files import get_thumbnailer
-
 from .models import Report
 
 
@@ -21,12 +19,7 @@ class ReportSerializer(serializers.ModelSerializer):
         exclude = ('email',)
 
     def get_photo(self, obj):
-        if obj.photo:
-            thumbnail_options = {'crop': True, 'size': (75, 75)}
-            thumbnailer = get_thumbnailer(obj.photo)
-            return thumbnailer.get_thumbnail(thumbnail_options).url
-        else:
-            return None
+        return obj.photo_url
 
 
 class CreateReportSerializer(serializers.ModelSerializer):
