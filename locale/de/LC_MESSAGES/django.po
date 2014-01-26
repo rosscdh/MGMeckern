@@ -84,7 +84,7 @@ msgstr "Wie schlimm ist das Problem?"
 
 #: mgmeckern/apps/report/models.py:29
 msgid "Upload photographic evidence"
-msgstr ""
+msgstr "Beweisfoto Hochladen"
 
 #: mgmeckern/apps/report/templates/report/report_form.html:3
 #, fuzzy
