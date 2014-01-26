@@ -30,6 +30,9 @@ class Report(models.Model):
     date_modified = models.DateTimeField(auto_now=True, auto_now_add=True, db_index=True)
     is_deleted = models.BooleanField(default=False, db_index=True)
 
+    is_public = models.BooleanField(default=False, db_index=True)
+    photo_is_public = models.BooleanField(default=False, db_index=True)
+
     objects = ReportManager()
 
     class Meta:
