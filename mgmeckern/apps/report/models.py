@@ -23,7 +23,7 @@ class Report(models.Model):
     email = models.EmailField(_('Email'))
     comment = models.TextField(_('Comment'), help_text=_('Your review of the problem'))
     address = models.CharField(_('Address'), max_length=255, blank=True)
-    severity = models.IntegerField(_('Severity'), help_text=_('How bad is the problem?'))
+    severity = models.IntegerField(_('Severity'), default=SEVERITY_CHOICES.irritating, help_text=_('How bad is the problem?'))
     lat = models.DecimalField(max_digits=22, decimal_places=19)
     lon = models.DecimalField(max_digits=22, decimal_places=19)
     photo = models.ImageField(upload_to=_report_upload_path, blank=True)

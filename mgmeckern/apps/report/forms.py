@@ -20,13 +20,12 @@ class ReportForm(forms.ModelForm):
     Public Form for the report model
     """
     comment = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}))
-    severity = forms.ChoiceField(choices=SEVERITY_CHOICES.get_choices(), initial=0, widget=forms.RadioSelect)
     lat = forms.CharField(widget=forms.HiddenInput)
     lon = forms.CharField(widget=forms.HiddenInput)
 
     class Meta:
         model = Report
-        exclude = ('is_deleted',)
+        exclude = ('severity', 'is_deleted', 'is_public', 'photo_is_public')
 
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
@@ -41,7 +40,6 @@ class ReportForm(forms.ModelForm):
             PrependedText('email', '@'),
             'comment',
             'address',
-            InlineRadios('severity'),
             'photo',
             'lat',
             'lon',
