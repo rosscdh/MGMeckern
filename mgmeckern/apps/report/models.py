@@ -26,7 +26,7 @@ class Report(models.Model):
     severity = models.IntegerField(_('Severity'), default=SEVERITY_CHOICES.irritating, help_text=_('How bad is the problem?'))
     lat = models.DecimalField(max_digits=22, decimal_places=19)
     lon = models.DecimalField(max_digits=22, decimal_places=19)
-    photo = models.ImageField(upload_to=_report_upload_path, blank=True)
+    photo = models.ImageField(upload_to=_report_upload_path, blank=True, help_text=_('Upload photographic evidence'))
 
     date_created = models.DateTimeField(auto_now=False, auto_now_add=True, db_index=True)
     date_modified = models.DateTimeField(auto_now=True, auto_now_add=True, db_index=True)

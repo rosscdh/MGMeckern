@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-12 09:47+0100\n"
+"POT-Creation-Date: 2014-01-26 09:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,13 +18,25 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: mgmeckern/settings.py:49
+#: mgmeckern/settings.py:51
 msgid "German"
 msgstr "Deutsch"
 
-#: mgmeckern/settings.py:50
+#: mgmeckern/settings.py:52
 msgid "English"
 msgstr "Englisch"
+
+#: mgmeckern/apps/public/templates/public/about.html:3
+msgid "About"
+msgstr "Impressum"
+
+#: mgmeckern/apps/public/templates/public/home.html:4
+msgid "Report a problem"
+msgstr "Problem melden"
+
+#: mgmeckern/apps/public/templates/public/home.html:9
+msgid "Where is the problem?"
+msgstr "Wo ist das Problem?"
 
 #: mgmeckern/apps/report/__init__.py:7
 msgid "Critical"
@@ -38,108 +50,97 @@ msgstr "schlecht"
 msgid "Irritating"
 msgstr "nervig"
 
-#: mgmeckern/apps/report/forms.py:45
+#: mgmeckern/apps/report/forms.py:53
 msgid "Street Address..."
 msgstr "Straßen Adresse..."
 
-#: mgmeckern/apps/report/forms.py:57
+#: mgmeckern/apps/report/forms.py:65
 msgid "Search"
 msgstr ""
 
-#: mgmeckern/apps/report/models.py:12
+#: mgmeckern/apps/report/models.py:23
 msgid "Email"
 msgstr "E-Mail"
 
-#: mgmeckern/apps/report/models.py:12
-msgid "Your email address"
-msgstr "Ihre E-Mail-Adresse"
-
-#: mgmeckern/apps/report/models.py:13 templates/email/new_report.email:13
+#: mgmeckern/apps/report/models.py:24
 msgid "Comment"
 msgstr "Kommentar"
 
-#: mgmeckern/apps/report/models.py:13
+#: mgmeckern/apps/report/models.py:24
 msgid "Your review of the problem"
 msgstr "Ihre Meinung zu dem Problem"
 
-#: mgmeckern/apps/report/models.py:14
+#: mgmeckern/apps/report/models.py:25
 msgid "Address"
 msgstr "Adresse"
 
-#: mgmeckern/apps/report/models.py:14
-msgid "The approximate address of the problem"
-msgstr "Die ungefähre Adresse des Problems"
-
-#: mgmeckern/apps/report/models.py:15
+#: mgmeckern/apps/report/models.py:26
 msgid "Severity"
 msgstr "Schwere"
 
-#: mgmeckern/apps/report/models.py:15
+#: mgmeckern/apps/report/models.py:26
 msgid "How bad is the problem?"
 msgstr "Wie schlimm ist das Problem?"
 
-#: templates/email/new_report.email:1
-msgid "A new Report has been lodged"
-msgstr "[altatadtlabor] Melder - neuer Eintrag"
-
-#: templates/email/new_report.email:3
-msgid ""
-"\n"
-"Hi there,\n"
-"\n"
-"A new problem has been lodged."
+#: mgmeckern/apps/report/models.py:29
+msgid "Upload photographic evidence"
 msgstr ""
-"\n"
-"Guten Tag,\n"
-"\n"
-"Ein neuen problem ist gemeldet."
 
-#: templates/email/new_report.email:8
-msgid "Date:"
-msgstr "Datum:"
-
-#: templates/email/new_report.email:9
-msgid "From:"
-msgstr "Von:"
-
-#: templates/email/new_report.email:10
+#: mgmeckern/apps/report/templates/report/report_form.html:3
 #, fuzzy
-msgid "Severity:"
-msgstr "Schwere"
-
-#: templates/email/new_report.email:11
-#, fuzzy
-msgid "Address:"
-msgstr "Adresse"
-
-msgid "About"
-msgstr "Impressum"
-
-msgid "Report a problem"
-msgstr "Problem melden"
-
-msgid "Recent Reports"
+msgid "Create a new Report"
 msgstr "Aktuelle Berichte"
 
-msgid "Level"
-msgstr "Schwere"
+#~ msgid "Your email address"
+#~ msgstr "Ihre E-Mail-Adresse"
 
-msgid "Where is the problem?"
-msgstr "Wo ist das Problem?"
+#~ msgid "The approximate address of the problem"
+#~ msgstr "Die ungefähre Adresse des Problems"
 
-msgid ""
-"So you have found a problem that you think needs to be looked at or "
-"repaired?"
-msgstr ""
-"Sie ein Problem, dass Sie denken, Bedürfnisse zu sah oder repariert "
-"werden gefunden?"
+#~ msgid "A new Report has been lodged"
+#~ msgstr "[altatadtlabor] Melder - neuer Eintrag"
 
-msgid ""
-"Enter the street address or use the map to find the location of the "
-"problem you would like to report."
-msgstr ""
-"Geben Sie die Adresse oder die Karte, um den Standort des Problems zu "
-"findenSie möchten zu berichten."
+#~ msgid ""
+#~ "\n"
+#~ "Hi there,\n"
+#~ "\n"
+#~ "A new problem has been lodged."
+#~ msgstr ""
+#~ "\n"
+#~ "Guten Tag,\n"
+#~ "\n"
+#~ "Ein neuen problem ist gemeldet."
 
-msgid "Double cick the map to add a new report!"
-msgstr "Doppelklicken die Karte um einen neuen Bericht hinzufügen!"
+#~ msgid "Date:"
+#~ msgstr "Datum:"
+
+#~ msgid "From:"
+#~ msgstr "Von:"
+
+#, fuzzy
+#~ msgid "Severity:"
+#~ msgstr "Schwere"
+
+#, fuzzy
+#~ msgid "Address:"
+#~ msgstr "Adresse"
+
+#~ msgid "Level"
+#~ msgstr "Schwere"
+
+#~ msgid ""
+#~ "So you have found a problem that you think needs to be looked at or "
+#~ "repaired?"
+#~ msgstr ""
+#~ "Sie ein Problem, dass Sie denken, Bedürfnisse zu sah oder repariert "
+#~ "werden gefunden?"
+
+#~ msgid ""
+#~ "Enter the street address or use the map to find the location of the "
+#~ "problem you would like to report."
+#~ msgstr ""
+#~ "Geben Sie die Adresse oder die Karte, um den Standort des Problems zu "
+#~ "findenSie möchten zu berichten."
+
+#~ msgid "Double cick the map to add a new report!"
+#~ msgstr "Doppelklicken die Karte um einen neuen Bericht hinzufügen!"
