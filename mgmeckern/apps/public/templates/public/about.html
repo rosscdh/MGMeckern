@@ -1,8 +1,12 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %}{% load url from future %}{% load i18n %}
 
 {% block page_title %}{% trans 'About' %}{% endblock %}
 
-
 {% block content %}
-About
+<div class="row">
+    <div class="col-sm-5">
+        <h2>{% trans 'About' %}</h2>
+        <p>Infos</p>
+    </div>
+</div>
 {% endblock %}

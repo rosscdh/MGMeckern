@@ -2,7 +2,18 @@
 
 {% block page_title %}{% trans 'Create a new Report' %}{% endblock %}
 
-{% block content %}
+
+{% block css %}
+<style>
+html,body{
+  padding: 10px;
+}
+</style>
+{% endblock %}
+
+
+{% block outer_content %}
+    <h3>{% trans 'Create a new Report' %}</h3>
     {{ form.errors }}
     {% crispy form %}
 {% endblock %}

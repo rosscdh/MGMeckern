@@ -1,11 +1,14 @@
 {% load url from future %}{% load i18n leaflet_tags crispy_forms_tags templatetag_handlebars l10n thumbnail %}
 
+<span id="{{ map_selector }}">{% leaflet_map map_name callback=map_init_callback %}</span>
+
 <style>
     div.leaflet-control-geosearch {
         display:none;
     }
     div#mg_meckern {
-        min-height:550px;
+        min-height:100%;
+        min-width:100%;
     }
     iframe#id_report_form_create{
         width:100%;
@@ -13,13 +16,8 @@
     }
 </style>
 
-<div class="row">
-    <span id="{{ map_selector }}">{% leaflet_map map_name callback=map_init_callback %}</span>
-</div>
-
 {% tplhandlebars "tpl-report_form" %}
-    {#% crispy report_form %#}
-    <iframe id="id_report_form_create" src="{% url 'report:create' %}" frameborder="0" style="margin:0px;height:460px"></iframe>
+    <iframe id="id_report_form_create" src="{% url 'report:create' %}" frameborder="0" style="margin:0px;height:560px"></iframe>
 {% endtplhandlebars %}
 
 {% tplhandlebars "tpl-report" %}

@@ -3,19 +3,21 @@
 
 {% block page_title %}{% trans 'Report a problem' %}{% endblock %}
 
-{% block prebody %}
+{#% block prebody %#}
+{% block commented_prebody %}
     <div class="container">
         <div class="page-header text-center">
             <h2>{% trans 'Where is the problem?' %}</h2>
         </div>
         {% crispy search_form %}
     </div>
-
-    {% report_map 'mgmeckern-map' 'window.map_init_basic' %}
-
 {% endblock %}
 
-{% block content %}{% endblock %}
+
+{% block content %}
+    {% report_map 'mgmeckern-map' 'window.map_init_basic' %}
+{% endblock %}
+
 
 {% block js %}
 <script type="text/javascript">
@@ -24,9 +26,26 @@
 * Callback called by leaf js when the map is loaded
 */
 function map_init_basic (map, options) {
+
+    // var HTMLInfoControl = L.Control.extend({
+    //     options: {
+    //         position: 'topright'
+    //     },
+    //     onAdd: function (map) {
+    //         // create the control container with a particular class name
+    //         var container = L.DomUtil.create('div', '');
+    //         $(container).html('<h2>Info HTML goes here</h2>');
+    //         return container;
+    //     }
+    // });
+    // var HTMLInfoControlInstance = new HTMLInfoControl();
+    // map.addControl(HTMLInfoControlInstance);
+    // HTMLInfoControlInstance.removeFrom(map);
+
+
     // initialize our map
     $('#mgmeckern-map').map_control({
-            'map':map,
+            'map': map,
             'map_options': options,
             'create_report_url': '{{ report_api_url }}',
             'pins': {{ pins|jsonify }}
@@ -49,7 +68,9 @@ $(document).ready(function(){
         });
     }
 
-    $('#div_id_q').addClass('col-md-10');
+    $('#id_q').on('click', function (e) {
+        $(this).select();
+    });
 
     $('form#frm-address-search').keypress( function ( e ) {
         if ( e.keyCode == 10 || e.keyCode == 13 ) {

@@ -5,7 +5,8 @@ from django.db import models
 class ReportManager(models.Manager):
 
     def active(self, **kwargs):
-        return self.public(is_deleted=False)
+        #return self.public(is_deleted=False)
+        return self.filter(is_deleted=False)
 
     def private(self, **kwargs):
         return self.filter(is_public=False).filter(**kwargs)
