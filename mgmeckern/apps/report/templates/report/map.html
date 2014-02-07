@@ -14,10 +14,14 @@
         width:100%;
         height:100%;
     }
+    .leaflet-popup-content{
+        padding:0px;
+        margin:0px;
+    }
 </style>
 
 {% tplhandlebars "tpl-report_form" %}
-    <iframe id="id_report_form_create" src="{% url 'report:create' %}" frameborder="0" style="margin:0px;height:500px"></iframe>
+    <iframe id="id_report_form_create" src="{% url 'report:create' %}" frameborder="0" style="margin:0px;padding:0px;height:390px"></iframe>
 {% endtplhandlebars %}
 
 {% tplhandlebars "tpl-report" %}
