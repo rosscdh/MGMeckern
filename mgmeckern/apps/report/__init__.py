@@ -11,5 +11,5 @@ SEVERITY_CHOICES = get_namedtuple_choices('SEVERITY_CHOICES', (
 
 REPORT_TYPE_CHOICES = get_namedtuple_choices('REPORT_TYPE_CHOICES', (
         (0, 'damage', _('Damage')),
-        (1, 'improvement', _('Improvment')),
+        (1, 'improvement', _('Improvement')),
 ))

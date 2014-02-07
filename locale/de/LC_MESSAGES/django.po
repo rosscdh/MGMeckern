@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-26 09:55+0100\n"
+"POT-Creation-Date: 2014-02-07 16:14+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,6 +27,7 @@ msgid "English"
 msgstr "Englisch"
 
 #: mgmeckern/apps/public/templates/public/about.html:3
+#: mgmeckern/apps/public/templates/public/about.html:8 templates/nav.html:15
 msgid "About"
 msgstr "Impressum"
 
@@ -34,7 +35,7 @@ msgstr "Impressum"
 msgid "Report a problem"
 msgstr "Problem melden"
 
-#: mgmeckern/apps/public/templates/public/home.html:9
+#: mgmeckern/apps/public/templates/public/home.html:10
 msgid "Where is the problem?"
 msgstr "Wo ist das Problem?"
 
@@ -50,46 +51,74 @@ msgstr "schlecht"
 msgid "Irritating"
 msgstr "nervig"
 
-#: mgmeckern/apps/report/forms.py:53
+#: mgmeckern/apps/report/__init__.py:13
+msgid "Damage"
+msgstr "versehren"
+
+#: mgmeckern/apps/report/__init__.py:14
+msgid "Improvement"
+msgstr "verbesserung"
+
+#: mgmeckern/apps/report/forms.py:19
 msgid "Street Address..."
 msgstr "Straßen Adresse..."
 
-#: mgmeckern/apps/report/forms.py:65
+#: mgmeckern/apps/report/forms.py:31
 msgid "Search"
-msgstr ""
+msgstr "Suche"
 
-#: mgmeckern/apps/report/models.py:23
+#: mgmeckern/apps/report/models.py:25
 msgid "Email"
 msgstr "E-Mail"
 
-#: mgmeckern/apps/report/models.py:24
+#: mgmeckern/apps/report/models.py:26
 msgid "Comment"
 msgstr "Kommentar"
 
-#: mgmeckern/apps/report/models.py:24
+#: mgmeckern/apps/report/models.py:26
 msgid "Your review of the problem"
 msgstr "Ihre Meinung zu dem Problem"
 
-#: mgmeckern/apps/report/models.py:25
+#: mgmeckern/apps/report/models.py:27
 msgid "Address"
 msgstr "Adresse"
 
-#: mgmeckern/apps/report/models.py:26
+#: mgmeckern/apps/report/models.py:29
 msgid "Severity"
 msgstr "Schwere"
 
-#: mgmeckern/apps/report/models.py:26
+#: mgmeckern/apps/report/models.py:29
 msgid "How bad is the problem?"
 msgstr "Wie schlimm ist das Problem?"
 
-#: mgmeckern/apps/report/models.py:29
+#: mgmeckern/apps/report/models.py:30
+msgid "Type of Report"
+msgstr "Art der Bericht"
+
+#: mgmeckern/apps/report/models.py:30
+msgid "What kind of report is this?"
+msgstr "Welche Art von Bericht ist das?"
+
+#: mgmeckern/apps/report/models.py:35
 msgid "Upload photographic evidence"
 msgstr "Beweisfoto Hochladen"
+
+#: mgmeckern/apps/report/templates/report/map.html:32
+msgid "Photo must be approved"
+msgstr "Das Foto muss genehmigt werden"
+
+#: mgmeckern/apps/report/templates/report/map.html:33
+msgid "full-size"
+msgstr "in voller Größe"
 
 #: mgmeckern/apps/report/templates/report/report_form.html:3
 #, fuzzy
 msgid "Create a new Report"
 msgstr "Aktuelle Berichte"
+
+#: templates/nav.html:11
+msgid "Problem Report"
+msgstr "Problem melden"
 
 #~ msgid "Your email address"
 #~ msgstr "Ihre E-Mail-Adresse"
