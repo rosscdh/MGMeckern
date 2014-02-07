@@ -17,7 +17,7 @@
 </style>
 
 {% tplhandlebars "tpl-report_form" %}
-    <iframe id="id_report_form_create" src="{% url 'report:create' %}" frameborder="0" style="margin:0px;height:560px"></iframe>
+    <iframe id="id_report_form_create" src="{% url 'report:create' %}" frameborder="0" style="margin:0px;height:500px"></iframe>
 {% endtplhandlebars %}
 
 {% tplhandlebars "tpl-report" %}
@@ -258,12 +258,13 @@ $(function() {
         init_map: function (map, options) {
             var self = this;
             var marker = null;
+
+            map.doubleClickZoom.disable();
+
             self.map = map;
             self.map.markers = []; // container for our markers
 
             self._log('initializing the map');
-
-            self.map.doubleClickZoom.disable();
 
             // setup the map listeners
             self._map_listen(map);
