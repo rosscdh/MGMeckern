@@ -29,7 +29,7 @@ class AddressSearchForm(forms.Form):
             Div(
                 'q',
                 Button('btn-search-btn', _('Search'), css_id='search-btn', css_class='btn btn-info input-lg'),
-                Button('btn-add-marker-btn', 'Add Report', css_id='add-marker-btn', css_class='btn btn-lg btn-success hide'),
+                Button('btn-add-marker-btn', _('Add Report'), css_id='add-marker-btn', css_class='btn btn-lg btn-success hide'),
                 css_class='row '
             ),
         )
