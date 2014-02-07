@@ -47,7 +47,7 @@ class ReportForm(forms.ModelForm):
 
     class Meta:
         model = Report
-        exclude = ('severity', 'is_deleted', 'is_public', 'photo_is_public')
+        exclude = ('severity', 'is_deleted', 'is_public', 'photo_is_public', 'report_type')
 
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
