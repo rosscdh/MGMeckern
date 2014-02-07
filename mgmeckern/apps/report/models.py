@@ -5,7 +5,7 @@ from django.template.defaultfilters import slugify
 
 from easy_thumbnails.files import get_thumbnailer
 
-from . import SEVERITY_CHOICES
+from . import SEVERITY_CHOICES, REPORT_TYPE_CHOICES
 from .managers import ReportManager
 
 import os
@@ -25,16 +25,19 @@ class Report(models.Model):
     email = models.EmailField(_('Email'))
     comment = models.TextField(_('Comment'), help_text=_('Your review of the problem'))
     address = models.CharField(_('Address'), max_length=255, blank=True)
-    severity = models.IntegerField(_('Severity'), default=SEVERITY_CHOICES.irritating, help_text=_('How bad is the problem?'))
+
+    severity = models.IntegerField(_('Severity'), default=SEVERITY_CHOICES.irritating, choices=SEVERITY_CHOICES.get_choices(), help_text=_('How bad is the problem?'))
+    report_type = models.IntegerField(_('Type of Report'), default=REPORT_TYPE_CHOICES.damage, choices=REPORT_TYPE_CHOICES.get_choices(), help_text=_('What kind of report is this?'))
+
     lat = models.DecimalField(max_digits=22, decimal_places=19)
     lon = models.DecimalField(max_digits=22, decimal_places=19)
+
     photo = models.ImageField(upload_to=_report_upload_path, blank=True, help_text=_('Upload photographic evidence'))
 
     date_created = models.DateTimeField(auto_now=False, auto_now_add=True, db_index=True)
     date_modified = models.DateTimeField(auto_now=True, auto_now_add=True, db_index=True)
     is_deleted = models.BooleanField(default=False, db_index=True)
 
-    is_public = models.BooleanField(default=False, db_index=True)
     photo_is_public = models.BooleanField(default=False, db_index=True)
 
     objects = ReportManager()

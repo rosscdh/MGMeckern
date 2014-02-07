@@ -27,27 +27,27 @@
 */
 function map_init_basic (map, options) {
 
-    // var HTMLInfoControl = L.Control.extend({
-    //     options: {
-    //         position: 'topright'
-    //     },
-    //     onAdd: function (map) {
-    //         // create the control container with a particular class name
-    //         var container = L.DomUtil.create('div', '');
-    //         $(container).html('<h2>Info HTML goes here</h2>');
-    //         return container;
-    //     }
-    // });
-    // var HTMLInfoControlInstance = new HTMLInfoControl();
-    // map.addControl(HTMLInfoControlInstance);
-    // HTMLInfoControlInstance.removeFrom(map);
+    // Markers and icons as they relate to report_type
+    var damageMarker = L.AwesomeMarkers.icon({
+      icon: 'glyphicon-wrench',
+      markerColor: 'red'
+    });
+    var improvmentMarker = L.AwesomeMarkers.icon({
+      icon: 'glyphicon-thumbs-up',
+      markerColor: 'green'
+    });
 
+    var icons = {
+        '0': damageMarker,
+        '1': improvmentMarker,
+    };
 
     // initialize our map
     $('#mgmeckern-map').map_control({
             'map': map,
             'map_options': options,
             'create_report_url': '{{ report_api_url }}',
+            'icons': icons,
             'pins': {{ pins|jsonify }}
     });
 }

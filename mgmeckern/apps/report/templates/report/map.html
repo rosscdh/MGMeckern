@@ -284,7 +284,7 @@ $(function() {
             var report_popupContent = null;
             $.each(self.options.pins, function (i, item) {
                 report_popupContent = self.templates.report(item);
-                self.map.fireEvent( "add_marker", {lat: item.lat, lon: item.lon, template: report_popupContent} );
+                self.map.fireEvent( "add_marker", {lat: item.lat, lon: item.lon, report_type: item.report_type, template: report_popupContent} );
             })
 
             // Geo Search
@@ -313,7 +313,9 @@ $(function() {
             });
 
             map.on('add_marker', function ( e ) {
-                var marker = L.marker([e.lat, e.lon]);
+                var icon = self.options.icons[e.report_type];
+                var marker = L.marker([e.lat, e.lon], {icon: icon});
+
                 var template = e.template;
                 var open = e.open || false;
 

@@ -8,3 +8,8 @@ SEVERITY_CHOICES = get_namedtuple_choices('SEVERITY_CHOICES', (
         (1, 'bad', _('Bad')),
         (0, 'irritating', _('Irritating')),
 ))
+
+REPORT_TYPE_CHOICES = get_namedtuple_choices('REPORT_TYPE_CHOICES', (
+        (0, 'damage', _('Damage')),
+        (1, 'improvement', _('Improvment')),
+))
