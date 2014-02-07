@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
+from django.contrib.humanize.templatetags.humanize import naturaltime
+
 from rest_framework import serializers
 
 from .models import Report
@@ -12,12 +14,20 @@ class ReportSerializer(serializers.ModelSerializer):
     """
     photo = serializers.SerializerMethodField('get_photo_url')
     thumbnail = serializers.SerializerMethodField('get_thumbnail_url')
+    date_created = serializers.SerializerMethodField('get_date_created')
+    date_modified = serializers.SerializerMethodField('get_date_modified')
     css_severity = serializers.CharField(source='css_severity', read_only=True, required=False)
     display_severity = serializers.CharField(source='display_severity', read_only=True, required=False)
 
     class Meta:
         model = Report
         exclude = ('email',)
+
+    def get_date_created(self, obj):
+        return naturaltime(obj.date_created)
+
+    def get_date_modified(self, obj):
+        return naturaltime(obj.date_modified)
 
     def get_photo_url(self, obj):
         try:
