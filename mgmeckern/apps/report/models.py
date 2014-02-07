@@ -9,6 +9,8 @@ from . import SEVERITY_CHOICES
 from .managers import ReportManager
 
 import os
+import logging
+logger = logging.getLogger('django.request')
 
 
 def _report_upload_path(instance, filename):
@@ -48,13 +50,16 @@ class Report(models.Model):
         return (self.lat, self.lon)
 
     @property
-    def photo_url(self):
-        if self.photo_is_public is False:
-            return '//placehold.it/75x75'
-        else:
+    def thumbnail(self):
+        if self.photo and self.photo_is_public is True:
             thumbnail_options = {'crop': True, 'size': (75, 75)}
             thumbnailer = get_thumbnailer(self.photo)
-            return thumbnailer.get_thumbnail(thumbnail_options).url
+            try:
+                return thumbnailer.get_thumbnail(thumbnail_options)
+            except Exception as e:
+                logger.critical('Exception converting image to thubmanil: %s : %s' % (e, self.photo))
+        # if an exception happens
+        return '//placehold.it/75x75'
 
     @property
     def display_severity(self):

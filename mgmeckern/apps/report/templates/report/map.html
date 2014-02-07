@@ -22,8 +22,12 @@
 
 {% tplhandlebars "tpl-report" %}
 <div class="row">
+    <div class="pull-right text-right" style="margin:0px 10px 0px 10px;">
+        <img src="{{ thumbnail }}" class="img-thumbnail" border="0"/>
+        {{#if photo_is_public}}{{else}}<br/><small>{% trans 'Photo must be approved' %}</small>{{/if}}
+        {{# if photo_is_public}}<br/><a target="_BLANK" href="{{ photo }}" style="margin:0px 25px 0px 0px;">{% trans 'full-size' %}</a>{{/if}}
+    </div>
     <blockquote>
-        <img class="pull-right" src="{{ photo }}" border="0"/>
         {{ comment }}
         <small>{{ date_modified }}</small>
     </blockquote>

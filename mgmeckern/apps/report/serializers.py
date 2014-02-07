@@ -10,7 +10,8 @@ class ReportSerializer(serializers.ModelSerializer):
     used when GETing a report hides email and adds a few 
     interesting fields
     """
-    photo = serializers.SerializerMethodField('get_photo')
+    photo = serializers.SerializerMethodField('get_photo_url')
+    thumbnail = serializers.SerializerMethodField('get_thumbnail_url')
     css_severity = serializers.CharField(source='css_severity', read_only=True, required=False)
     display_severity = serializers.CharField(source='display_severity', read_only=True, required=False)
 
@@ -18,8 +19,18 @@ class ReportSerializer(serializers.ModelSerializer):
         model = Report
         exclude = ('email',)
 
-    def get_photo(self, obj):
-        return obj.photo_url
+    def get_photo_url(self, obj):
+        try:
+            return obj.photo.url
+        except Exception as e:
+            return None
+
+    def get_thumbnail_url(self, obj):
+        try:
+            return obj.thumbnail.url
+        except Exception as e:
+            return obj.thumbnail
+
 
 
 class CreateReportSerializer(serializers.ModelSerializer):
