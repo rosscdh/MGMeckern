@@ -34,13 +34,13 @@ env.falsy = ['false','f','n','no','0',0]
 
 @task
 def staging():
-    env.project = 'mgm'
+    env.project = 'mgmeckern'
     env.environment = 'staging'
     env.environment_class = 'webfaction'
 
-    env.remote_project_path = '/home/rosscdh/webapps/%s/' % env.project
+    env.remote_project_path = '/home/rosscdh/webapps/mgm/'
     env.deploy_archive_path = '~/'
-    env.virtualenv_path = '/home/rosscdh/.virtualenvs/%s/' % env.project
+    env.virtualenv_path = '/home/rosscdh/.virtualenvs/mgm/'
 
     env.user = 'rosscdh'
     env.application_user = 'rosscdh'
@@ -82,7 +82,7 @@ def clean_all():
         virtualenv(cmd='python %s%s/manage.py cleanup' % (env.remote_project_path, env.project))
         virtualenv(cmd='python %s%s/manage.py clean_nonces' % (env.remote_project_path, env.project))
         virtualenv(cmd='python %s%s/manage.py clean_associations' % (env.remote_project_path, env.project))
-        virtualenv(cmd='python %s%s/manage.py clear_cache' % (env.remote_project_path, env.project))
+        #virtualenv(cmd='python %s%s/manage.py clear_cache' % (env.remote_project_path, env.project))
         virtualenv(cmd='python %s%s/manage.py clean_pyc' % (env.remote_project_path, env.project))
         virtualenv(cmd='python %s%s/manage.py compile_pyc' % (env.remote_project_path, env.project))
 
@@ -319,7 +319,7 @@ def relink():
 def clean_start():
     stop_service()
     clean_pyc()
-    clear_cache()
+    #clear_cache()
     clean_pyc()
     #precompile_pyc()
     start_service()
@@ -385,7 +385,7 @@ def fixtures():
 def assets():
     # Activate virtualenv
     virtualenv('python %s%s/manage.py collectstatic --noinput' % (env.remote_project_path, env.project,))
-    virtualenv('python %s%s/manage.py compress --force' % (env.remote_project_path, env.project,))
+    #virtualenv('python %s%s/manage.py compress --force' % (env.remote_project_path, env.project,))
 
 @task
 def requirements():
