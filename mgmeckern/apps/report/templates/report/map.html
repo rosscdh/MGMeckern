@@ -263,11 +263,10 @@ $(function() {
             var self = this;
             var marker = null;
 
-            // disable doubleclick zoom
-            map.doubleClickZoom = false;
-
             self.map = map;
             self.map.markers = []; // container for our markers
+            // disable doubleclick zoom
+            self.map.doubleClickZoom = false;
 
             self._log('initializing the map');
 

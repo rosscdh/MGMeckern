@@ -27,6 +27,9 @@
 */
 function map_init_basic (map, options) {
 
+    // disable doubleclick zoom
+    map.doubleClickZoom = false;
+
     // Markers and icons as they relate to report_type
     var damageMarker = L.AwesomeMarkers.icon({
       icon: 'glyphicon-wrench',
