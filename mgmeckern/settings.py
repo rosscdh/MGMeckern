@@ -20,6 +20,7 @@ ADMINS = (
 
 MANAGERS = ADMINS + (
     ("Stephano Picco", 's.picco@spicone.de'),
+    ("Martin Platzer", 'platzer@wfmg.de'),
 )
 
 db_config = {
