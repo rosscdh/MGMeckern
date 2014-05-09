@@ -1,0 +1,24 @@
+{% extends 'base.html' %}{% load url from future %}{% load i18n %}
+
+{% block page_title %}{% trans 'Sorry, we dont cover that area' %}{% endblock %}
+
+{% block outer_content %}
+
+    {% block commented_prebody %}
+        <div class="container">
+            <div class="page-header text-center">
+                <h2>{% trans 'Sorry, we dont cover that area' %}</h2>
+            </div>
+            <div>
+        </div>
+    {% endblock %}
+
+    {% block content %}
+        {% blocktrans %}
+        <div>Unfortunately, we dont take reports for the area that you clicked on.</div>
+        <div>Please make a report within the indicated boundries.</div>
+        {% endblocktrans %}
+        </div>
+    {% endblock %}
+
+{% endblock %}

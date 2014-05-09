@@ -3,7 +3,6 @@
 
 {% block page_title %}{% trans 'Report a problem' %}{% endblock %}
 
-{#% block prebody %#}
 {% block commented_prebody %}
     <div class="container">
         <div class="page-header text-center">
@@ -51,25 +50,12 @@ function map_init_basic (map, options) {
             'map_options': options,
             'create_report_url': '{{ report_api_url }}',
             'icons': icons,
+            'auto_geolocation': false,
             'pins': {{ pins|jsonify }}
     });
 }
 
 $(document).ready(function(){
-
-    if (navigator.geolocation) {
-        // if we support geoloc and the user allows it
-        navigator.geolocation.getCurrentPosition(function ( pos ) {
-            // got it, set the maps position
-            var lat = pos.coords.latitude;
-            var lon = pos.coords.longitude
-            window.map_control.map.panTo([lat, lon]);
-        },
-        // error
-        function ( e ) {
-
-        });
-    }
 
     $('#id_q').on('click', function (e) {
         $(this).select();

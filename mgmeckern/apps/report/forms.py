@@ -16,7 +16,7 @@ from .models import Report
 
 @parsleyfy
 class AddressSearchForm(forms.Form):
-    q = forms.CharField(label='', initial='', required=True, widget=forms.TextInput(attrs={'class': 'form-control input-lg', 'placeholder': _('Street Address...')}))
+    q = forms.CharField(label='', initial='', required=True, widget=forms.TextInput(attrs={'class': 'form-control input-sm', 'placeholder': _('Street Address...')}))
 
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
@@ -28,9 +28,12 @@ class AddressSearchForm(forms.Form):
         self.helper.layout = Layout(
             Div(
                 'q',
-                Button('btn-search-btn', _('Search'), css_id='search-btn', css_class='btn btn-info input-lg'),
-                Button('btn-add-marker-btn', _('Add Report'), css_id='add-marker-btn', css_class='btn btn-lg btn-success hide'),
-                css_class='row '
+                #Button('btn-search-btn', _('Search'), css_id='search-btn', css_class='btn btn-info input-sm'),
+                HTML('<span id="search-btn" class="glyphicon glyphicon-search search-btn btn btn-info"></span>'),
+                HTML('<span id="add-marker-btn" class="glyphicon glyphicon-plus add-marker-btn btn btn-success"></span>'),
+                HTML('<a class="nav-btn pull-right" href="%s"><span id="about-btn" class="glyphicon glyphicon-info-sign btn btn-default"></span></a>' % reverse('public:about')),
+                #Button('btn-add-marker-btn', _('Add Report'), css_id='add-marker-btn', css_class='btn btn-sm btn-success hide'),
+                css_class=''
             ),
         )
         super(AddressSearchForm, self).__init__(*args, **kwargs)

@@ -10,7 +10,7 @@
         min-height:100%;
         min-width:100%;
     }
-    iframe#id_report_form_create{
+    iframe#out_of_bounds, iframe#id_report_form_create{
         width:100%;
         height:100%;
     }
@@ -19,6 +19,10 @@
         margin:0px;
     }
 </style>
+
+{% tplhandlebars "tpl-out_of_bounds" %}
+    <iframe id="id_out_of_bounds" src="{% url 'report:out_of_bounds' %}" frameborder="0" style="margin:0px;padding:0px;height:390px"></iframe>
+{% endtplhandlebars %}
 
 {% tplhandlebars "tpl-report_form" %}
     <iframe id="id_report_form_create" src="{% url 'report:create' %}" frameborder="0" style="margin:0px;padding:0px;height:390px"></iframe>
@@ -65,11 +69,13 @@ $(function() {
             'map_options': null,
             'create_report_url': null,
             'q': $('#id_q'), // address search element
-            'search_btn': $('input#search-btn'), // address search button
-            'add_marker_btn': $('input#add-marker-btn'),    // add marker button
+            'search_btn': $('#search-btn'), // address search button
+            'add_marker_btn': $('#add-marker-btn'),    // add marker button
             'report_form_tpl': $('script#tpl-report_form'), // the report form template
             'report_tpl': $('script#tpl-report'),   // the report display template
+            'out_of_bounds_tpl': $('script#tpl-out_of_bounds'),   // the report display template
             'pins': [],
+            'auto_geolocation': false,
             'debug': true
         },
         _log: function ( msg ) {
@@ -83,11 +89,12 @@ $(function() {
             var self = this;
             self._log('creating')
 
-            self.iframe = $('#id_report_form_create').contents();
+            self.report_iframe = $('#id_report_form_create').contents();
 
             self.set_templates();
             self._controls();
             self._listen();
+            self._geolocation();
 
             // if we have the map and map options passed in
             // then init the map
@@ -96,14 +103,35 @@ $(function() {
             }
 
             // assign to window so we can access it
-            if (self.options.debug === true)
+            if (self.options.debug === true) {
                 window.map_control = self;
+            }
+        },
+        _geolocation: function () {
+            var self = this;
+            self._log('Auto_Geolocation: ' + self.options.auto_geolocation)
+            if ( self.options.auto_geolocation === true ) {
+                if (navigator.geolocation) {
+                    // if we support geoloc and the user allows it
+                    navigator.geolocation.getCurrentPosition(function ( pos ) {
+                        // got it, set the maps position
+                        var lat = pos.coords.latitude;
+                        var lon = pos.coords.longitude
+                        window.map_control.map.panTo([lat, lon]);
+                    },
+                    // error
+                    function ( e ) {
+
+                    });
+                }
+            }
         },
         _controls: function () {
             var self = this;
             self._log('setting controls');
             // setup the reuseable report form
             self.report_form_popup = self.init_report_form_popup();
+            self.report_out_of_bounds_popup = self.init_report_out_of_bounds_popup();
 
             // hide the add-maker-btn by default
             self.options.add_marker_btn.addClass('hide');
@@ -142,17 +170,21 @@ $(function() {
                 self.options.add_marker_btn.removeClass('hide');
             });
 
-            // populate the report form
-            $('body').on( "populate_report_form", function( event, map, latlng, marker ) {
-                self._log('populate_report_form');
+            /**
+            * The popup that handles a new report submission
+            *
+            */
+            $('body').on( "populate_report_form", function( event, map, latlng, marker, popup ) {
+
+                self.current_marker = marker;
 
                 $('#id_report_form_create').on('load', function ( e ) {
                     // set the self iframe
                     self._log('loaded iframe')
 
-                    self.iframe = $(this).contents();
+                    self.report_iframe = $(this).contents();
                     try {
-                        var json = $.parseJSON(self.iframe.text());
+                        var json = $.parseJSON(self.report_iframe.text());
                         $('body').trigger( "form_submitted", [json] )
 
                     } catch ( e ) {
@@ -160,22 +192,54 @@ $(function() {
                         var address = (self.entered_data.id_address || self.options.q.val() || null);
 
                         if ( address === null) {
-                            self.iframe.find('#div_id_address:first').hide(); // hide the outer parent row
-                            self.iframe.find('#id_address:first').val( '' );
+                            self.report_iframe.find('#div_id_address:first').hide(); // hide the outer parent row
+                            self.report_iframe.find('#id_address:first').val( '' );
                         } else {
-                            self.iframe.find('#div_id_address:first').show(); // show the outer parent row
-                            self.iframe.find('#id_address:first').val( address );
+                            self.report_iframe.find('#div_id_address:first').show(); // show the outer parent row
+                            self.report_iframe.find('#id_address:first').val( address );
                         }
 
-                        self.iframe.find('#id_comment:first').val( self.entered_data.id_comment || '');
-                        self.iframe.find('#id_email:first').val( self.entered_data.id_email || '');
-                        self.iframe.find('#id_lat:first').val(latlng.lat.toFixed(15));
-                        self.iframe.find('#id_lon:first').val(latlng.lng.toFixed(15));
+                        self.report_iframe.find('#id_comment:first').val( self.entered_data.id_comment || '');
+                        self.report_iframe.find('#id_email:first').val( self.entered_data.id_email || '');
+                        self.report_iframe.find('#id_lat:first').val(latlng.lat.toFixed(15));
+                        self.report_iframe.find('#id_lon:first').val(latlng.lng.toFixed(15));
 
                         // setup fhe form
                         $('body').trigger( "form_init", [map, latlng, marker] )
                     }
                 })// end iframe load
+
+                /**
+                * Actually pop the populated report frame up
+                */
+                marker.addTo(map)
+                      .bindPopup(popup)
+                      .openPopup();
+
+            });
+
+            /**
+            * The popup that handles the out of bounds message
+            *
+            */
+            $('body').on( "populate_out_of_bounds", function( event, map, latlng, marker, popup ) {
+                self._log('populate_out_of_bounds');
+
+                self.current_marker = marker;
+
+                $('#id_out_of_bounds').on('load', function ( e ) {
+                    // set the self iframe
+                    self._log('loaded iframe')
+
+                    self.report_iframe = $(this).contents();
+                })// end iframe load
+
+                /**
+                * Actually pop the populated report frame up
+                */
+                marker.addTo(map)
+                      .bindPopup(popup)
+                      .openPopup();
 
             });
 
@@ -183,7 +247,7 @@ $(function() {
             $('body').on( "form_init", function( event, map, latlng, marker ) {
                 self._log('report form_init');
 
-                var form = self.iframe.find( '#frm-create-report' );
+                var form = self.report_iframe.find( '#frm-create-report' );
                 //form.parsley();
 
                 form.find('#frm-create-report textarea').on('change', function ( e ) {
@@ -193,7 +257,7 @@ $(function() {
                 });
 
                 form.on('submit', function ( e ) {
-                    console.log(self.iframe)
+                    console.log(self.report_iframe)
                 })
 
             });
@@ -237,6 +301,7 @@ $(function() {
             self._log('setting templates');
             self.templates.report_form = Handlebars.compile( self.options.report_form_tpl.html() );
             self.templates.report = Handlebars.compile( self.options.report_tpl.html() );
+            self.templates.out_of_bounds = Handlebars.compile( self.options.out_of_bounds_tpl.html() );
         },
         geosearch_provider: function () {
             var self = this;
@@ -245,6 +310,16 @@ $(function() {
                         showMarker: false,
                         provider: new L.GeoSearch.Provider.OpenStreetMap()
                     })
+        },
+        init_report_out_of_bounds_popup: function () {
+            var self = this;
+            return L.popup({ 
+                        minWidth: 300,
+                        maxWidth: 520
+                    })
+                    .setContent(
+                        self.templates.out_of_bounds({}) // init the basic form template
+                    );
         },
         init_report_form_popup: function () {
             var self = this;
@@ -267,6 +342,18 @@ $(function() {
             self.map.markers = []; // container for our markers
             // disable doubleclick zoom
             self.map.doubleClickZoom = false;
+
+            self.polyline = L.polyline([L.latLng(51.19525334252562,6.4319586753845215),
+                                       L.latLng(51.193088349701085,6.434297561645508),
+                                       L.latLng(51.19082911829619,6.432323455810547),
+                                       L.latLng(51.19147462428599,6.428782939910889),
+                                       L.latLng(51.192510104591065,6.426272392272949),
+                                       L.latLng(51.19525334252562,6.4319586753845215)], {color: 'red'});
+            self.poly_bounds = self.polyline.getBounds();
+
+            self.polyline.addTo(self.map)  // add the red polyline
+
+            self.map.fitBounds(self.poly_bounds); // fit to the polys boundries
 
             self._log('initializing the map');
 
@@ -305,16 +392,23 @@ $(function() {
             map.on('add_report_marker', function ( e ) {
                 // console.log('dblclick')
                 var latlng = e.latlng || map.getCenter();
-                var marker = new L.Marker(latlng, {title: 'New Report', draggable: true, riseOnHover: true})
-                marker.pk = null; // used to id our map markers
+                var popup = null;
 
-                marker.addTo(map)
-                      .bindPopup(self.report_form_popup)
-                      .openPopup();
+                if ( self.poly_bounds.contains(latlng) === false ) {
+                    // not clicked in bounds
+                    var marker = new L.Marker(latlng, {title: 'New Report', draggable: true, riseOnHover: true})
+                    marker.pk = null; // used to id our map markers
+                    popup = self.report_out_of_bounds_popup;
+                    $('body').trigger('populate_out_of_bounds', [map, latlng, marker, popup]);
 
-                self.current_marker = marker;
+                } else {
 
-                $('body').trigger('populate_report_form', [map, latlng, marker]);
+                    // has clicked in bounds
+                    var marker = new L.Marker(latlng, {title: 'New Report', draggable: true, riseOnHover: true})
+                    marker.pk = null; // used to id our map markers
+                    popup = self.report_form_popup;
+                    $('body').trigger('populate_report_form', [map, latlng, marker, popup]);
+                }             
             });
 
             map.on('add_marker', function ( e ) {
@@ -337,7 +431,9 @@ $(function() {
             * on double click on map then add the report marker
             */
             map.on("dblclick", function ( e ) {
+                //e.preventDefault();
                 self.map.fireEvent( "add_report_marker", {latlng: e.latlng} );
+                //return false;
             })
             /**
             * fire the show marker button
@@ -346,16 +442,6 @@ $(function() {
                 $('body').trigger( "geosearch_results_found" );
             })
 
-            map.on('popupopen', function ( e ) {
-                /**
-                * fire this event when we are looking at a new report form popup
-                */
-                if ( e.popup == self.report_form_popup ) {
-                    var latlng = e.popup._latlng;
-                    var marker = e.target;
-                    $('body').trigger('populate_report_form', [map, latlng, marker]);
-                }
-            });
         }
     });
 
