@@ -233,13 +233,12 @@ $(function() {
                 //form.parsley();
 
                 form.find('#frm-create-report textarea').on('change', function ( e ) {
-                    console.log('settings value')
                     var elem = $(e.target);
                     self.entered_data[elem.attr('id')] = elem.val();
                 });
 
                 form.on('submit', function ( e ) {
-                    console.log(self.report_iframe)
+                    self._log(self.report_iframe);
                 })
 
             });
@@ -374,7 +373,6 @@ $(function() {
             var self = this;
 
             map.on('add_report_marker', function ( e ) {
-                // console.log('dblclick')
                 var latlng = e.latlng || map.getCenter();
                 var popup = null;
 
