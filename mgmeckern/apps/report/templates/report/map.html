@@ -326,11 +326,11 @@ $(function() {
             // disable doubleclick zoom
             self.map.doubleClickZoom = false;
 
-            self.polyline = L.polyline([L.latLng(51.191286352639665, 6.431636810302734),
-                                        L.latLng(51.19905864236346, 6.430349349975586),
-                                        L.latLng(51.19671902526111, 6.421208381652832),
-                                        L.latLng(51.191582207738506, 6.423954963684082),
-                                        L.latLng(51.191286352639665, 6.431636810302734)], {color: 'red'});
+            self.polyline = L.polyline([L.latLng(51.196665239562854,6.432795524597168),
+                                        L.latLng(51.196127379126594,6.425113677978516),
+                                        L.latLng(51.19116358244632,6.426272392272919),
+                                        L.latLng(51.19112083246547,6.434383392333984),
+                                        L.latLng(51.196665239562854,6.432795524597168)], {color: 'red'});
             self.poly_bounds = self.polyline.getBounds();
 
             self.polyline.addTo(self.map)  // add the red polyline
