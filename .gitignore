@@ -10,6 +10,7 @@ test_steps.json
 *.db
 *.db
 *.sqlite
+conf/secret.*
 tags
 composer.lock
 .AppleDouble
