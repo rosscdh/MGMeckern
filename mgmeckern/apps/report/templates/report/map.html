@@ -176,8 +176,6 @@ $(function() {
             */
             $('body').on( "populate_report_form", function( event, map, latlng, marker, popup ) {
 
-                self.current_marker = marker;
-
                 $('#id_report_form_create').on('load', function ( e ) {
                     // set the self iframe
                     self._log('loaded iframe')
@@ -209,13 +207,6 @@ $(function() {
                     }
                 })// end iframe load
 
-                /**
-                * Actually pop the populated report frame up
-                */
-                marker.addTo(map)
-                      .bindPopup(popup)
-                      .openPopup();
-
             });
 
             /**
@@ -225,21 +216,12 @@ $(function() {
             $('body').on( "populate_out_of_bounds", function( event, map, latlng, marker, popup ) {
                 self._log('populate_out_of_bounds');
 
-                self.current_marker = marker;
-
                 $('#id_out_of_bounds').on('load', function ( e ) {
                     // set the self iframe
                     self._log('loaded iframe')
 
                     self.report_iframe = $(this).contents();
                 })// end iframe load
-
-                /**
-                * Actually pop the populated report frame up
-                */
-                marker.addTo(map)
-                      .bindPopup(popup)
-                      .openPopup();
 
             });
 
@@ -264,17 +246,19 @@ $(function() {
 
             $('body').on( "form_submitted", function ( event, json ) {
                 // ok so we have a winner
-                self.current_marker.closePopup();
+                var marker = self.current_marker;
+                marker.closePopup();
+
                 var pk = json.id
                 // update with nice template json
                 var popup = L.popup().setContent(self.templates.report(json))
                 // bind to the new popup
-                self.current_marker.bindPopup(popup, {minWidth: 300});
+                marker.bindPopup(popup, {minWidth: 300});
                 // now open it
-                self.current_marker.openPopup();
+                marker.openPopup();
                 // reset json
                 self.entered_data = {};
-            })
+            });
 
             /**
             * button controls
@@ -396,7 +380,7 @@ $(function() {
 
                 if ( self.poly_bounds.contains(latlng) === false ) {
                     // not clicked in bounds
-                    var marker = new L.Marker(latlng, {title: 'New Report', draggable: true, riseOnHover: true})
+                    var marker = new L.Marker(latlng, {title: 'Out Of Bounds', draggable: false, riseOnHover: true})
                     marker.pk = null; // used to id our map markers
                     popup = self.report_out_of_bounds_popup;
                     $('body').trigger('populate_out_of_bounds', [map, latlng, marker, popup]);
@@ -408,7 +392,16 @@ $(function() {
                     marker.pk = null; // used to id our map markers
                     popup = self.report_form_popup;
                     $('body').trigger('populate_report_form', [map, latlng, marker, popup]);
-                }             
+                }
+
+                /**
+                * Actually pop the populated report frame up
+                */
+                self.current_marker = marker;
+                self.current_marker.addTo(map)
+                      .bindPopup(popup)
+                      .openPopup();
+
             });
 
             map.on('add_marker', function ( e ) {
@@ -442,8 +435,23 @@ $(function() {
                 $('body').trigger( "geosearch_results_found" );
             })
 
+            map.on('popupopen', function ( e ) {
+                /**
+                * fire this event when we are looking at a new report form popup
+                */
+                if ( e.popup == self.report_form_popup ) {
+                    var map = this;
+
+                    // set the lat and lang of the form
+                    var latlng = e.popup._latlng;
+                    var marker = e.target;
+                    $('body').trigger('populate_report_form', [map, latlng, marker, self.report_form_popup]);
+                }
+            });
+
         }
     });
+
 
 });
 </script>
