@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-09 11:08+0200\n"
+"POT-Creation-Date: 2014-05-09 11:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,9 +27,21 @@ msgid "English"
 msgstr "Englisch"
 
 #: mgmeckern/apps/public/templates/public/about.html:3
-#: mgmeckern/apps/public/templates/public/about.html:8
+#: mgmeckern/apps/public/templates/public/about.html:7
 msgid "About"
 msgstr "Impressum"
+
+#: mgmeckern/apps/public/templates/public/about.html:7
+msgid "What is this about?"
+msgstr ""
+
+#: mgmeckern/apps/public/templates/public/about.html:14
+msgid ""
+"\n"
+"    A simple way to report problems that you may find within your "
+"community.\n"
+"    "
+msgstr ""
 
 #: mgmeckern/apps/public/templates/public/home.html:4
 msgid "Report a problem"
