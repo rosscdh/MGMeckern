@@ -326,12 +326,11 @@ $(function() {
             // disable doubleclick zoom
             self.map.doubleClickZoom = false;
 
-            self.polyline = L.polyline([L.latLng(51.19525334252562,6.4319586753845215),
-                                       L.latLng(51.193088349701085,6.434297561645508),
-                                       L.latLng(51.19082911829619,6.432323455810547),
-                                       L.latLng(51.19147462428599,6.428782939910889),
-                                       L.latLng(51.192510104591065,6.426272392272949),
-                                       L.latLng(51.19525334252562,6.4319586753845215)], {color: 'red'});
+            self.polyline = L.polyline([L.latLng(51.191286352639665, 6.431636810302734),
+                                        L.latLng(51.19905864236346, 6.430349349975586),
+                                        L.latLng(51.19671902526111, 6.421208381652832),
+                                        L.latLng(51.191582207738506, 6.423954963684082),
+                                        L.latLng(51.191286352639665, 6.431636810302734)], {color: 'red'});
             self.poly_bounds = self.polyline.getBounds();
 
             self.polyline.addTo(self.map)  // add the red polyline
@@ -425,13 +424,13 @@ $(function() {
                 //e.preventDefault();
                 self.map.fireEvent( "add_report_marker", {latlng: e.latlng} );
                 //return false;
-            })
+            });
             /**
             * fire the show marker button
             */
             map.on('geosearch_showlocation', function ( e ) {
                 $('body').trigger( "geosearch_results_found" );
-            })
+            });
 
             map.on('popupopen', function ( e ) {
                 /**
