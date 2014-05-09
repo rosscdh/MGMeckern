@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-07 16:24+0100\n"
+"POT-Creation-Date: 2014-05-09 11:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,16 +18,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: mgmeckern/settings.py:51
+#: mgmeckern/settings.py:52
 msgid "German"
 msgstr "Deutsch"
 
-#: mgmeckern/settings.py:52
+#: mgmeckern/settings.py:53
 msgid "English"
 msgstr "Englisch"
 
 #: mgmeckern/apps/public/templates/public/about.html:3
-#: mgmeckern/apps/public/templates/public/about.html:8 templates/nav.html:15
+#: mgmeckern/apps/public/templates/public/about.html:8
 msgid "About"
 msgstr "Impressum"
 
@@ -35,7 +35,7 @@ msgstr "Impressum"
 msgid "Report a problem"
 msgstr "Problem melden"
 
-#: mgmeckern/apps/public/templates/public/home.html:10
+#: mgmeckern/apps/public/templates/public/home.html:9
 msgid "Where is the problem?"
 msgstr "Wo ist das Problem?"
 
@@ -62,14 +62,6 @@ msgstr "verbesserung"
 #: mgmeckern/apps/report/forms.py:19
 msgid "Street Address..."
 msgstr "Straßen Adresse..."
-
-#: mgmeckern/apps/report/forms.py:31
-msgid "Search"
-msgstr "Suche"
-
-#: mgmeckern/apps/report/forms.py:32
-msgid "Add Report"
-msgstr "Bericht hinzufügen"
 
 #: mgmeckern/apps/report/models.py:25
 msgid "Email"
@@ -107,22 +99,42 @@ msgstr "Welche Art von Bericht ist das?"
 msgid "Upload photographic evidence"
 msgstr "Beweisfoto Hochladen"
 
-#: mgmeckern/apps/report/templates/report/map.html:32
+#: mgmeckern/apps/report/templates/report/map.html:36
 msgid "Photo must be approved"
 msgstr "Das Foto muss genehmigt werden"
 
-#: mgmeckern/apps/report/templates/report/map.html:33
+#: mgmeckern/apps/report/templates/report/map.html:37
 msgid "full-size"
 msgstr "in voller Größe"
+
+#: mgmeckern/apps/report/templates/report/out-of-bounds.html:3
+#: mgmeckern/apps/report/templates/report/out-of-bounds.html:10
+msgid "Sorry, we dont cover that area"
+msgstr ""
+
+#: mgmeckern/apps/report/templates/report/out-of-bounds.html:17
+msgid ""
+"\n"
+"        <div>Unfortunately, we dont take reports for the area that you "
+"clicked on.</div>\n"
+"        <div>Please make a report within the indicated boundries.</div>\n"
+"        "
+msgstr ""
 
 #: mgmeckern/apps/report/templates/report/report_form.html:3
 #, fuzzy
 msgid "Create a new Report"
 msgstr "Aktuelle Berichte"
 
-#: templates/nav.html:11
+#: templates/nav.html:7
 msgid "Problem Report"
 msgstr "Problem melden"
+
+#~ msgid "Search"
+#~ msgstr "Suche"
+
+#~ msgid "Add Report"
+#~ msgstr "Bericht hinzufügen"
 
 #~ msgid "Your email address"
 #~ msgstr "Ihre E-Mail-Adresse"
