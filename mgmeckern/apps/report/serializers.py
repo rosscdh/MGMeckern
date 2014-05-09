@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
+from django.utils.safestring import mark_safe
 from django.contrib.humanize.templatetags.humanize import naturaltime
 
 from rest_framework import serializers
 
 from .models import Report
+
+import markdown2
+MD = markdown2.Markdown()
 
 
 class ReportSerializer(serializers.ModelSerializer):
@@ -12,6 +16,7 @@ class ReportSerializer(serializers.ModelSerializer):
     used when GETing a report hides email and adds a few 
     interesting fields
     """
+    comment = serializers.SerializerMethodField('get_comment')
     photo = serializers.SerializerMethodField('get_photo_url')
     thumbnail = serializers.SerializerMethodField('get_thumbnail_url')
     date_created = serializers.SerializerMethodField('get_date_created')
@@ -22,6 +27,9 @@ class ReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Report
         exclude = ('email',)
+
+    def get_comment(self, obj):
+        return mark_safe(MD.convert(obj.comment))
 
     def get_date_created(self, obj):
         return naturaltime(obj.date_created)
