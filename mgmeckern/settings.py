@@ -259,15 +259,10 @@ LEAFLET_CONFIG = {
     'DEFAULT_ZOOM': 17,
     'PLUGINS': {
         'GeoSearch': {
-            'css': ['https://raw.github.com/smeijer/L.GeoSearch/master/src/css/l.geosearch.css'],
+            'css': ['{STATIC_URL}css/l.geosearch.css'.format(STATIC_URL=STATIC_URL)],
             'js': ['{STATIC_URL}js/l.control.geosearch.js'.format(STATIC_URL=STATIC_URL), '{STATIC_URL}js/l.geosearch.provider.openstreetmap.js'.format(STATIC_URL=STATIC_URL)],
             'auto-include': True,
         },
-        'markercluster': {
-            'css': ['https://raw.github.com/Leaflet/Leaflet.markercluster/master/dist/MarkerCluster.css'],
-            'js': '{STATIC_URL}js/leaflet.markercluster.js'.format(STATIC_URL=STATIC_URL),
-            'auto-include': True,
-        }
     }
 }
 
