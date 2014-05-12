@@ -31,5 +31,5 @@ django-jsonify
 # not used
 # -e git+https://github.com/wrobstory/folium.git#egg=folium
 # jinja2
-
+django-pipeline
 markdown2

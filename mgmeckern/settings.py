@@ -120,6 +120,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.locale.LocaleMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.gzip.GZipMiddleware',
+    'pipeline.middleware.MinifyHTMLMiddleware',
 )
 
 ROOT_URLCONF = 'mgmeckern.urls'
@@ -168,6 +170,7 @@ HELPER_APPS = (
     'jsonify',
     'templatetag_handlebars',
     'rest_framework',
+    'pipeline',
     'easy_thumbnails',
     'django_rq',
 )
