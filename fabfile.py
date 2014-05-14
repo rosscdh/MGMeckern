@@ -68,7 +68,7 @@ def virtualenv(cmd, **kwargs):
 
 @task
 def pip_install():
-    virtualenv('pip install django --upgrade')
+    virtualenv('pip install django-pipeline')
 
 @task
 def check_permissions():
@@ -360,6 +360,10 @@ def update_env_conf():
         with cd(project_path):
             virtualenv('cp %s/conf/%s.local_settings.py %s/%s/local_settings.py' % (full_version_path, env.environment, full_version_path, env.project))
             virtualenv('cp %s/conf/%s.wsgi.py %s/%s/wsgi.py' % (full_version_path, env.environment, full_version_path, env.project))
+
+        secret_settings = '%s/conf/secret.%s.local_settings.py' % (env.local_project_path, env.environment)
+        if os.path.exists(secret_settings):
+            put('%s %s/%s/' % (secret_settings, full_version_path, env.project), env.deploy_archive_path, use_sudo=as_sudo)
 
 @task
 def unzip_archive():
