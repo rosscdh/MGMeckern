@@ -62,7 +62,7 @@ class Report(models.Model):
             except Exception as e:
                 logger.critical('Exception converting image to thubmanil: %s : %s' % (e, self.photo))
         # if an exception happens
-        return '//placehold.it/75x75'
+        return None
 
     @property
     def display_severity(self):

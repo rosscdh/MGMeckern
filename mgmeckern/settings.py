@@ -269,6 +269,10 @@ LEAFLET_CONFIG = {
     }
 }
 
+SOUTH_MIGRATION_MODULES = {
+    'easy_thumbnails': 'easy_thumbnails.south_migrations',
+}
+
 # Neat trick http://www.robgolding.com/blog/2010/05/03/extending-settings-variables-with-local_settings-py-in-django/
 try:
     LOCAL_SETTINGS

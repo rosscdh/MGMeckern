@@ -32,8 +32,7 @@
 <div class="row">
     <div class="pull-right text-center" style="margin:0px 10px 0px 10px;">
         <small>{{ date_created }}</small><br/>
-        <img src="{{ thumbnail }}" class="img-thumbnail" border="0"/>
-        {{#if photo_is_public}}{{else}}<br/><small>{% trans 'Photo must be approved' %}</small>{{/if}}
+        {{#if thumbnail}}<img src="{{ thumbnail }}" class="img-thumbnail" border="0"/>{{#if photo_is_public}}{{else}}<br/><small>{% trans 'Photo must be approved' %}</small>{{/if}}{{/if}}
         {{# if photo_is_public}}<br/><a target="_BLANK" href="{{ photo }}">{% trans 'full-size' %}</a>{{/if}}
     </div>
     <blockquote>
