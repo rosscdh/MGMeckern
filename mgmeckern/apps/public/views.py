@@ -16,6 +16,7 @@ class PublicHomeView(TemplateView):
         active_reports = Report.objects.active()
 
         context.update({
+            'search_form': None,
             'reports': active_reports,
             'pins': [ReportSerializer(r).data for r in active_reports]
         })

@@ -106,10 +106,25 @@ STATICFILES_FINDERS = (
 SECRET_KEY = 'sxtso-ceubz-6xq1hd!&p=q%9n4$9!e!$qk+m*8^z9_dfqg-j-'
 
 # List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': ['templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                "django.template.context_processors.debug",
+                'django.template.context_processors.request',
+                "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.i18n",
+                "django.template.context_processors.media",
+                "django.template.context_processors.static",
+                "django.template.context_processors.tz",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -162,7 +177,7 @@ PROJECT_APPS = (
 )
 
 HELPER_APPS = (
-    'south',
+    # 'south',
     'django_extensions',
     'crispy_forms',
     'parsley',
@@ -207,6 +222,9 @@ RQ_QUEUES = {
         'DB': 0,
     }
 }
+
+
+PIPELINE = {}
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -269,9 +287,9 @@ LEAFLET_CONFIG = {
     }
 }
 
-SOUTH_MIGRATION_MODULES = {
-    'easy_thumbnails': 'easy_thumbnails.south_migrations',
-}
+# SOUTH_MIGRATION_MODULES = {
+#     'easy_thumbnails': 'easy_thumbnails.south_migrations',
+# }
 
 # Neat trick http://www.robgolding.com/blog/2010/05/03/extending-settings-variables-with-local_settings-py-in-django/
 try:

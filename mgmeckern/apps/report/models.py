@@ -34,8 +34,8 @@ class Report(models.Model):
 
     photo = models.ImageField(upload_to=_report_upload_path, blank=True, help_text=_('Upload photographic evidence'))
 
-    date_created = models.DateTimeField(auto_now=False, auto_now_add=True, db_index=True)
-    date_modified = models.DateTimeField(auto_now=True, auto_now_add=True, db_index=True)
+    date_created = models.DateTimeField(auto_now_add=True, db_index=True)
+    date_modified = models.DateTimeField(auto_now=True, db_index=True)
     is_deleted = models.BooleanField(default=False, db_index=True)
 
     photo_is_public = models.BooleanField(default=False, db_index=True)

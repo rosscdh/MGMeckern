@@ -1,25 +1,21 @@
 Django
-South==0.8.2
-Werkzeug==0.9.4
-django-crispy-forms==1.4.0
-django-debug-toolbar==0.10.2
-django-extensions==1.2.5
-django-geojson==2.1.1
--e git+https://github.com/rosscdh/django-jsonfield.git@lawpal#egg=django_jsonfield
--e git+https://github.com/rosscdh/django-leaflet.git#egg=django-leaflet
-django-parsley==0.1
--e git+https://github.com/rosscdh/django-templatetag-handlebars.git#egg=django_templatetag_handlebars
-djangorestframework==2.3.8
-gunicorn==18.0
-psycopg2==2.5.1
-six==1.4.1
-sqlparse==0.1.9
-wsgiref==0.1.2
+Werkzeug
+django-crispy-forms
+django-debug-toolbar
+django-extensions
+django-geojson
+django-jsonfield
+django-leaflet
+django-parsley
+django-templatetag-handlebars
+djangorestframework
+gunicorn
+psycopg2
 markdown
 dj-database-url
 dj_static
 django-templated-email
-django-rq # requeue for queue tasks
+django-rq
 
 # images
 pillow

@@ -16,13 +16,13 @@ class ReportSerializer(serializers.ModelSerializer):
     used when GETing a report hides email and adds a few 
     interesting fields
     """
-    comment = serializers.SerializerMethodField('get_comment')
-    photo = serializers.SerializerMethodField('get_photo_url')
-    thumbnail = serializers.SerializerMethodField('get_thumbnail_url')
-    date_created = serializers.SerializerMethodField('get_date_created')
-    date_modified = serializers.SerializerMethodField('get_date_modified')
-    css_severity = serializers.CharField(source='css_severity', read_only=True, required=False)
-    display_severity = serializers.CharField(source='display_severity', read_only=True, required=False)
+    comment = serializers.SerializerMethodField()
+    photo = serializers.SerializerMethodField()
+    thumbnail = serializers.SerializerMethodField()
+    date_created = serializers.SerializerMethodField()
+    date_modified = serializers.SerializerMethodField()
+    css_severity = serializers.CharField(read_only=True, required=False)
+    display_severity = serializers.CharField(read_only=True, required=False)
 
     class Meta:
         model = Report
@@ -37,13 +37,13 @@ class ReportSerializer(serializers.ModelSerializer):
     def get_date_modified(self, obj):
         return naturaltime(obj.date_modified)
 
-    def get_photo_url(self, obj):
+    def get_photo(self, obj):
         try:
             return obj.photo.url
         except Exception as e:
             return None
 
-    def get_thumbnail_url(self, obj):
+    def get_thumbnail(self, obj):
         try:
             return obj.thumbnail.url
         except Exception as e:
