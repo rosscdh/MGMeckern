@@ -5,7 +5,6 @@ from settings import *
 PROJECT_ENVIRONMENT = 'staging'
 
 DEBUG = False
-TEMPLATE_DEBUG = DEBUG
 
 MEDIA_URL = '/media/'
 STATIC_URL = '/static/'

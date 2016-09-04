@@ -12,25 +12,25 @@ for test_app in ['testserver','test']:
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__+ '/../'))
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     ("Ross Crawford-'dHeureuse", 'sendrossemail@gmail.com'),
 )
 
 MANAGERS = ADMINS + (
-    ("Stephano Picco", 's.picco@spicone.de'),
-    ("Martin Platzer", 'platzer@wfmg.de'),
 )
 
-db_config = {
-    'ENGINE': 'django.db.backends.sqlite3',
-    'NAME': os.path.join(SITE_ROOT, 'dev.db'),
-}
 
 DATABASES = {
-    'default': db_config
+    'default': {
+        #'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'mgmeckern_development',
+        'USER': 'rosscdh',
+        'PASSWORD': '',
+    }
 }
+
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -121,12 +121,14 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
+                'mgmeckern.apps.public.context_processors.search_form',
             ],
         },
     },
 ]
 
 MIDDLEWARE_CLASSES = (
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -139,26 +141,12 @@ MIDDLEWARE_CLASSES = (
     'pipeline.middleware.MinifyHTMLMiddleware',
 )
 
+CORS_ORIGIN_ALLOW_ALL = True
+
 ROOT_URLCONF = 'mgmeckern.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'mgmeckern.wsgi.application'
-
-TEMPLATE_DIRS = (
-    os.path.join(SITE_ROOT, 'templates'),
-)
-
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.contrib.auth.context_processors.auth',
-    'django.core.context_processors.debug',
-    'django.core.context_processors.i18n',
-    'django.core.context_processors.media',
-    'django.core.context_processors.static',
-    'django.core.context_processors.tz',
-    'django.contrib.messages.context_processors.messages',
-    'django.core.context_processors.request',
-    'mgmeckern.apps.public.context_processors.search_form',
-)
 
 DJANGO_APPS = (
     'django.contrib.auth',
@@ -169,6 +157,7 @@ DJANGO_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.humanize',
+    'django.contrib.gis',
 )
 
 PROJECT_APPS = (
@@ -185,9 +174,12 @@ HELPER_APPS = (
     'jsonify',
     'templatetag_handlebars',
     'rest_framework',
+    'rest_framework.authtoken',
+    'rest_framework_gis',
     'pipeline',
     'easy_thumbnails',
     'django_rq',
+    'corsheaders',
 )
 
 INSTALLED_APPS = DJANGO_APPS + HELPER_APPS + PROJECT_APPS
@@ -211,7 +203,7 @@ TEMPLATED_EMAIL_FILE_EXTENSION = 'email'
 if 'SENDGRID_USERNAME' in os.environ:
     EMAIL_HOST_USER = os.environ['SENDGRID_USERNAME']
     EMAIL_HOST_PASSWORD = os.environ['SENDGRID_PASSWORD']
-    EMAIL_HOST= 'smtp.sendgrid.net'
+    EMAIL_HOST = 'smtp.sendgrid.net'
     EMAIL_PORT = 587
     EMAIL_USE_TLS = True
 
@@ -226,6 +218,30 @@ RQ_QUEUES = {
 
 PIPELINE = {}
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+        #'elbow.apps.api.permissions.ApiObjectPermission',
+    ),
+    'DEFAULT_MODEL_SERIALIZER_CLASS':
+        'rest_framework.serializers.ModelSerializer',
+
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ),
+    # 'DEFAULT_FILTER_BACKENDS': (
+    #     'rest_framework.filters.DjangoFilterBackend',
+    # ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 30,
+    'DEFAULT_CACHE_RESPONSE_TIMEOUT': 60 * 5,
+}
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error when DEBUG=False.
@@ -286,6 +302,8 @@ LEAFLET_CONFIG = {
         },
     }
 }
+
+BASE_URL = 'http://localhost:8003'
 
 # SOUTH_MIGRATION_MODULES = {
 #     'easy_thumbnails': 'easy_thumbnails.south_migrations',

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+from django.contrib.gis.db.models import PointField
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import slugify
 
@@ -26,13 +27,25 @@ class Report(models.Model):
     comment = models.TextField(_('Comment'), help_text=_('Your review of the problem'))
     address = models.CharField(_('Address'), max_length=255, blank=True)
 
-    severity = models.IntegerField(_('Severity'), default=SEVERITY_CHOICES.irritating, choices=SEVERITY_CHOICES.get_choices(), help_text=_('How bad is the problem?'))
-    report_type = models.IntegerField(_('Type of Report'), default=REPORT_TYPE_CHOICES.damage, choices=REPORT_TYPE_CHOICES.get_choices(), help_text=_('What kind of report is this?'))
+    severity = models.IntegerField(_('Severity'),
+                                   default=SEVERITY_CHOICES.irritating,
+                                   choices=SEVERITY_CHOICES.get_choices(),
+                                   help_text=_('How bad is the problem?'))
+    report_type = models.IntegerField(_('Type of Report'),
+                                      default=REPORT_TYPE_CHOICES.damage,
+                                      choices=REPORT_TYPE_CHOICES.get_choices(),
+                                      help_text=_('What kind of report is this?'))
 
-    lat = models.DecimalField(max_digits=22, decimal_places=19)
-    lon = models.DecimalField(max_digits=22, decimal_places=19)
+    lat = models.FloatField()
+    lon = models.FloatField()
+    points = PointField(geography=True,
+                        null=True,
+                        blank=True,
+                        db_index=True)
 
-    photo = models.ImageField(upload_to=_report_upload_path, blank=True, help_text=_('Upload photographic evidence'))
+    photo = models.ImageField(upload_to=_report_upload_path,
+                              blank=True,
+                              help_text=_('Upload photographic evidence'))
 
     date_created = models.DateTimeField(auto_now_add=True, db_index=True)
     date_modified = models.DateTimeField(auto_now=True, db_index=True)
@@ -84,4 +97,4 @@ class Report(models.Model):
 """
 Import the signals
 """
-from .signals import on_new_report
+from .signals import on_new_report, set_report_point_field
