@@ -24,6 +24,7 @@ class Report(models.Model):
     User report model used to store the actual report
     """
     email = models.EmailField(_('Email'))
+    title = models.CharField(_('Title'), max_length=255, blank=True)
     comment = models.TextField(_('Comment'), help_text=_('Your review of the problem'))
     address = models.CharField(_('Address'), max_length=255, blank=True)
 
@@ -59,7 +60,9 @@ class Report(models.Model):
         ordering = ['-id']
 
     def __unicode__(self):
-        return u'{comment} @ {address}'.format(comment=self.comment, address=self.address if self.address not in [None, ''] else self.latlng )
+        return u'{title} {comment} @ {address}'.format(title=self.title,
+                                                       comment=self.comment,
+                                                       address=self.address if self.address not in [None, ''] else self.latlng )
 
     @property
     def latlng(self):

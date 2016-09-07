@@ -64,11 +64,11 @@ class ReportSerializer(serializers.ModelSerializer):
             return obj.thumbnail
 
 
-# class CreateReportSerializer(serializers.ModelSerializer):
-#     """
-#     used when POSTing a report
-#     """
-#     photo = Base64ImageField()
+class CreateReportSerializer(serializers.ModelSerializer):
+    """
+    used when POSTing a report
+    """
+    photo = Base64ImageField()
 
-#     class Meta:
-#         model = Report
+    class Meta:
+        model = Report

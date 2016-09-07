@@ -235,12 +235,12 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
-    # 'DEFAULT_FILTER_BACKENDS': (
-    #     'rest_framework.filters.DjangoFilterBackend',
-    # ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework.filters.DjangoFilterBackend',
+    ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 30,
-    'DEFAULT_CACHE_RESPONSE_TIMEOUT': 60 * 5,
+    # 'DEFAULT_CACHE_RESPONSE_TIMEOUT': 60 * 5,
 }
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
