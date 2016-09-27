@@ -8,5 +8,5 @@ from .views import CreateReportView
 urlpatterns = [
     # create report POST view
     url(r'^out-of-bounds/$', TemplateView.as_view(template_name='report/out-of-bounds.html'), name='out_of_bounds'),
-    # url(r'^$', csrf_exempt(CreateReportView.as_view()), name='create'),
+    url(r'^$', csrf_exempt(CreateReportView.as_view()), name='create'),
 ]
