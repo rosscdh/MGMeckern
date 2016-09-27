@@ -5,12 +5,19 @@ from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.i18n import i18n_patterns
 
+from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
+
 from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+
+    url(r'^api/v1/token-auth/', obtain_jwt_token),
+    url(r'^api/v1/token-refresh/', refresh_jwt_token),
+
     url(r'^api/v1/', include('mgmeckern.apps.api.urls', namespace='api_v1')),
+
     url(r'^create/', include('mgmeckern.apps.report.urls', namespace='report')),
 ]
 

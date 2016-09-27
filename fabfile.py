@@ -1,132 +1,164 @@
 from __future__ import with_statement
 from fabric.api import *
-from fabric.contrib.console import confirm
-from fabric.context_managers import settings
 from fabric.contrib import files
+#from fab_deploy import crontab
 
 from git import *
 
 import os
-import json
-import getpass
-import datetime
+import sys
 import time
+import shutil
+import getpass
 import requests
 from termcolor import colored
-from pprint import pprint
 
 debug = True
 
 env.local_project_path = os.path.dirname(os.path.realpath(__file__))
+# default to local override in env
+env.remote_project_path = env.local_project_path
 
-env.repo = Repo(env.local_project_path)
+try:
+    env.repo = Repo(env.local_project_path)
+except:
+    env.repo = None
 
-env.fixtures = 'sites test_cities transact lawyers'
+
+env.project = 'mgmeckern'
+env.celery_app_name = 'current'
+
+env.disable_known_hosts = True
+env.fixtures = None
+
+env.application_user = env.user = os.environ.get('USER', 'django')
+
 env.SHA1_FILENAME = None
 env.timestamp = time.time()
 env.is_predeploy = False
 env.local_user = getpass.getuser()
-env.environment = 'local'
 
-env.truthy = ['true','t','y','yes','1',1]
-env.falsy = ['false','f','n','no','0',0]
+env.environment = 'local'
+env.environment_class = 'development'
+env.key_filename = '~/.ssh/kumukan.pem'
+
+env.virtualenv_path = '~/.virtualenvs/mgmeckern/'
+env.current_branch = local("git rev-parse --abbrev-ref HEAD", capture=True)
+
+env.newrelic_api_token = None
+
+TRUTHY = ['true', 't', 'y', 'yes', '1', 1]
+FALSY = ['false', 'f', 'n', 'no', '0', 0]
+
+
+env.roledefs.update({
+    'cron-actor': [],
+    'db-actor': [],
+    'db': [],
+})
 
 
 @task
 def staging():
-    env.project = 'mgmeckern'
+    from config.environments import staging as config
+    env.application_user = env.user = 'django'
+
+    env.hosts = config.HOSTS if not env.hosts else env.hosts
+
     env.environment = 'staging'
-    env.environment_class = 'webfaction'
+    env.environment_class = 'staging'
+    env.newrelic_app_name = 'Karma-App Staging'
 
-    env.remote_project_path = '/home/rosscdh/webapps/mgm/'
-    env.deploy_archive_path = '~/'
-    env.virtualenv_path = '/home/rosscdh/.virtualenvs/mgm/'
+    env.remote_project_path = '/home/django/apps/mgmeckern/'
+    env.deploy_archive_path = '/home/django/apps/'
+    env.virtualenv_path = '/home/django/.virtualenvs/mgmeckern/'
+    env.remote_dashboard_path = None
 
-    env.user = 'rosscdh'
-    env.application_user = 'rosscdh'
+    env.start_service = 'supervisorctl start mgmeckern'
+    env.stop_service = 'supervisorctl stop mgmeckern'
+    env.start_worker = None
+    env.stop_worker = None
 
-    # connect to the port-forwarded ssh
-    env.hosts = ['rosscdh.webfactional.com']
+    env.roledefs.update({
+        'cron-actor': config.CRON_ACTOR,
+        'db-actor': config.DB_ACTOR,
+        'db': config.DB_HOST,
+    })
 
-    env.key_filename = None
 
-    env.start_service = '%sapache2/bin/start' % env.remote_project_path
-    env.stop_service = '%sapache2/bin/stop' % env.remote_project_path
-    env.light_restart = None
+@task
+def mkvirtualenv():
+    if not files.exists(env.virtualenv_path):
+        run('mkvirtualenv %s' % env.project)
+    run('workon %s' % env.project)
 
+@task
+def put_confs():
+    #sudo('rm /etc/nginx/sites-enabled/default')
+    # nginx
+    put(local_path='./config/environments/{environment}/mgmeckern-nginx'.format(environment=env.environment_class), remote_path='/etc/nginx/sites-enabled/', use_glob=False, use_sudo=True)
+    # supervisord
+    put(local_path='./config/environments/{environment}/mgmeckern.conf'.format(environment=env.environment_class), remote_path='/etc/supervisor/conf.d/', use_glob=False, use_sudo=True)
+    # uwsgi
+    put(local_path='./config/environments/{environment}/mgmeckern.ini'.format(environment=env.environment_class), remote_path='/etc/uwsgi/apps-enabled/', use_glob=False, use_sudo=True)
+
+
+@task
+def r(cmd):
+    run(cmd)
+
+
+@task
+def manage(cmd):
+    with cd(env.remote_project_path):
+        virtualenv(cmd='python %s%s/manage.py %s' % (env.remote_project_path, 'current', cmd))
+
+
+def proceed(msg='Proceed? (y,n)', color='yellow', terminate=True):
+    return prompt(colored(msg, color))
 
 
 @task
 def virtualenv(cmd, **kwargs):
-  # change to base dir
-  #with cd(env.remote_project_path):
-    if env.environment_class is 'webfaction':
-        # webfaction
-        run("source %sbin/activate; %s" % (env.virtualenv_path, cmd,), **kwargs)
-    else:
-        sudo("source %sbin/activate; %s" % (env.virtualenv_path, cmd,), user=env.application_user, **kwargs)
+    sudo("source %sbin/activate; %s" % (env.virtualenv_path, cmd,), user=env.application_user, **kwargs)
 
 @task
 def pip_install():
-    virtualenv('pip install django-pipeline')
+    virtualenv(cmd='pip install virtualenv virtualenvwrapper')
 
-@task
-def check_permissions():
-    with cd(env.remote_project_path):
-        virtualenv(cmd='python %s%s/manage.py check_permissions' % (env.remote_project_path, env.project))
 
 @task
 def clean_all():
     with cd(env.remote_project_path):
-        virtualenv(cmd='python %s%s/manage.py clean_pyc' % (env.remote_project_path, env.project))
-        virtualenv(cmd='python %s%s/manage.py cleanup' % (env.remote_project_path, env.project))
-        virtualenv(cmd='python %s%s/manage.py clean_nonces' % (env.remote_project_path, env.project))
-        virtualenv(cmd='python %s%s/manage.py clean_associations' % (env.remote_project_path, env.project))
-        #virtualenv(cmd='python %s%s/manage.py clear_cache' % (env.remote_project_path, env.project))
-        virtualenv(cmd='python %s%s/manage.py clean_pyc' % (env.remote_project_path, env.project))
-        virtualenv(cmd='python %s%s/manage.py compile_pyc' % (env.remote_project_path, env.project))
+        virtualenv(cmd='python %s%s/manage.py clean_pyc' % (env.remote_project_path, 'current'))
+        virtualenv(cmd='python %s%s/manage.py cleanup' % (env.remote_project_path, 'current'))
+        #virtualenv(cmd='python %s%s/manage.py clean_nonces' % (env.remote_project_path, 'current'))
+        #virtualenv(cmd='python %s%s/manage.py clean_associations' % (env.remote_project_path, 'current'))
+        #virtualenv(cmd='python %s%s/manage.py clear_cache' % (env.remote_project_path, 'current'))
+        virtualenv(cmd='python %s%s/manage.py compile_pyc' % (env.remote_project_path, 'current'))
 
 @task
 def clear_cache():
     with cd(env.remote_project_path):
-        virtualenv(cmd='python %s%s/manage.py clear_cache' % (env.remote_project_path, env.project))
+        virtualenv(cmd='python %s%s/manage.py clear_cache' % (env.remote_project_path, 'current'))
 
 @task
 def clean_pyc():
     with cd(env.remote_project_path):
-        virtualenv('python %s%s/manage.py clean_pyc' % (env.remote_project_path, env.project))
+        virtualenv('python %s%s/manage.py clean_pyc' % (env.remote_project_path, 'current'))
 
 @task
 def precompile_pyc():
-    virtualenv(cmd='python %s%s/manage.py compile_pyc' % (env.remote_project_path, env.project))
+    virtualenv(cmd='python %s%s/manage.py compile_pyc' % (env.remote_project_path, 'current'))
 
 @task
 def manage(cmd='validate'):
-    virtualenv('python %s%s/manage.py %s' % (env.remote_project_path, env.project, cmd))
+    virtualenv('python %s%s/manage.py %s' % (env.remote_project_path, 'current', cmd))
 
-def get_sha1():
-  cd(env.local_project_path)
+@task
+def get_sha1(path=None):
+  cd(env.local_project_path) if path is None else cd(path)
   return local('git rev-parse --short --verify HEAD', capture=True)
-
-@task
-def db_backup(db='mgm'):
-    db_backup_name = '%s.bak' % db
-    sudo('pg_dump --no-owner --no-acl -Fc %s > /tmp/%s' % (db, db_backup_name,), user='postgres')
-    local('scp -i %s %s@%s:/tmp/%s /tmp/' % (env.key_filename, env.user, env.host, db_backup_name,))
-
-@task
-def db_restore(db='mgm', db_file=None):
-    with settings(warn_only=True): # only warning as we will often have errors importing
-        if db_file is None:
-            db_file = '/tmp/%s.bak' % db
-            if not os.path.exists(db_file):
-                print(colored('Database Backup %s does not exist...' % db_file, 'red'))
-            else:
-                go = prompt(colored('Restore "%s" DB from a file entitled: "%s" in the "%s" environment: Proceed? (y,n)' % (db, db_file, env.environment,), 'yellow'))
-                if go in env.truthy:
-                    local('echo "DROP DATABASE %s;" | psql -h localhost -U %s' % (db, env.local_user,))
-                    local('echo "CREATE DATABASE %s WITH OWNER %s ENCODING \'UTF8\';" | psql -h localhost -U %s' % (db, env.local_user, env.local_user,))
-                    local('pg_restore -U %s -h localhost -d %s -Fc %s' % (env.local_user, db, db_file,))
 
 @task
 def git_tags():
@@ -148,7 +180,7 @@ def git_suggest_tag():
     next = [int(previous[0].replace('v',''))] + mapped #remove string v and append mapped list
     next_rev = next[2] = mapped[-1] + 1 # increment the last digit
     return {
-        'next': 'v%s' % '.'.join(map(str,next)), 
+        'next': 'v%s' % '.'.join(map(str,next)),
         'previous': '.'.join(previous)
     }
 
@@ -156,7 +188,7 @@ def git_suggest_tag():
 @runs_once
 def git_set_tag():
     proceed = prompt(colored('Do you want to tag this realease?', 'red'), default='y')
-    if proceed in env.truthy:
+    if proceed in TRUTHY:
         suggested = git_suggest_tag()
         tag = prompt(colored('Please enter a tag: previous: %s suggested: %s' % (suggested['previous'], suggested['next']), 'yellow'), default=suggested['next'])
         if tag:
@@ -168,15 +200,17 @@ def git_set_tag():
 #            local('git push origin %s' % tag)
 
 @task
-def git_export(branch='master'):
-  env.SHA1_FILENAME = get_sha1()
-  if not os.path.exists('/tmp/%s.zip' % env.SHA1_FILENAME):
-      local('git archive --format zip --output /tmp/%s.zip --prefix=%s/ %s' % (env.SHA1_FILENAME, env.SHA1_FILENAME, branch,), capture=False)
+def git_export(branch=None):
+    branch = env.current_branch if branch is None else branch
+
+    env.SHA1_FILENAME = get_sha1()
+    if not os.path.exists('/tmp/%s.zip' % env.SHA1_FILENAME):
+        local('git archive --format zip --output /tmp/%s.zip --prefix=%s/ %s' % (env.SHA1_FILENAME, env.SHA1_FILENAME, branch,), capture=False)
 
 @task
 @runs_once
 def current_version_sha():
-    current = '%s%s' % (env.remote_project_path, env.project)
+    current = '%s%s' % (env.remote_project_path, 'current')
     realpath = run('ls -al %s' % current)
     current_sha = realpath.split('/')[-1]
     return current_sha
@@ -187,68 +221,64 @@ def diff_outgoing_with_current():
     diff = local('git diff %s %s' % (get_sha1(), current_version_sha(),), capture=True)
     print(diff)
 
+@task
+@runs_once
+def celery_restart(name='worker.1'):
+    with settings(warn_only=True): # only warning as we will often have errors importing
+        celery_stop()
+        clean_pyc()
+        celery_start()
 
 @task
-def celery_log():
+def celery_start(name='worker.1', loglevel='INFO', concurrency=5):
     with settings(warn_only=True): # only warning as we will often have errors importing
-        sudo('supervisorctl fg %s' % env.celery_name )
+        sudo(env.start_worker)
+
+@task
+def celery_stop(name='worker.1'):
+    with settings(warn_only=True): # only warning as we will often have errors importing
+        sudo(env.stop_worker)
 
 @task
 def prepare_deploy():
     git_export()
 
-@task
-@runs_once
-def update_index():
-    with settings(host_string=env.db_host):
-        #for i in ['default lawyer', 'firms firm']:
-        for i in ['default lawyer',]:
-            virtualenv('python %s%s/manage.py update_index -a 100000 -u %s' % (env.remote_project_path, env.project, i))
 
 @task
 @runs_once
-def rebuild_index():
-    with settings(host_string=env.db_host):
-        #for i in ['default lawyer', 'firms firm']:
-        for i in ['default lawyer',]:
-            virtualenv('python %s%s/manage.py rebuild_index --noinput' % (env.remote_project_path, env.project,))
-
-@task
-@runs_once
-def migrate():
-    with settings():
-        virtualenv('python %s%s/manage.py migrate' % (env.remote_project_path, env.project))
-
-@task
-@runs_once
+@roles('db-actor')
 def syncdb():
     with settings():
-        virtualenv('python %s%s/manage.py syncdb' % (env.remote_project_path, env.project))
+        virtualenv('python %s%s/manage.py syncdb' % (env.remote_project_path, 'current'))
 
 @task
-def clean_versions():
+@runs_once
+@roles('db-actor')
+def migrate():
+    with settings():
+        #virtualenv('python %s%s/manage.py migrate core 0014 --fake --delete-ghost-migrations' % (env.remote_project_path, 'current'))
+        virtualenv('python %s%s/manage.py migrate' % (env.remote_project_path, 'current'))
+
+@task
+def clean_versions(delete=False, except_latest=3):
     current_version = get_sha1()
+
     versions_path = '%sversions' % env.remote_project_path
-    cmd = 'cd %s; ls %s/ | grep -v %s | xargs rm -R' % (versions_path, versions_path ,current_version,)
-    if env.environment_class is 'webfaction':
-        virtualenv(cmd)
-    else:
-        virtualenv(cmd)
+    #
+    # cd into the path so we can use xargs
+    # tail the list except the lastest N
+    # exclude the known current version
+    #
+    cmd = "cd {path};ls -t1 {path} | tail -n+{except_latest} | grep -v '{current_version}'".format(path=versions_path, except_latest=except_latest, current_version=current_version)
+    #
+    # optionally delete them
+    #
+    if delete in TRUTHY:
+        cmd = cmd + ' | xargs rm -Rf'
+
+    virtualenv(cmd)
 
 # ------ RESTARTERS ------#
-@task
-def supervisord_restart():
-    with settings(warn_only=True):
-        if env.environment_class is 'webfaction':
-            restart_service()
-        else:
-            sudo('supervisorctl restart uwsgi')
-
-@task
-def restart_lite():
-    with settings(warn_only=True):
-        sudo(env.light_restart)
-
 @task
 def stop_nginx():
     with settings(warn_only=True):
@@ -260,27 +290,23 @@ def start_nginx():
         sudo('service nginx start')
 
 @task
-def restart_nginx():
+def restart_nginx(event='restart'):
     with settings(warn_only=True):
-        sudo('service nginx restart')
+        sudo('service nginx %s' % event)
+
 
 @task
 def restart_service(heavy_handed=False):
     with settings(warn_only=True):
         if env.environment_class not in ['celery']: # dont restart celery nginx services
-            if env.environment_class == 'webfaction':
-                stop_service()
-                start_service()
-            else:
-                if not heavy_handed:
-                    restart_lite()
-                else:
-                    supervisord_restart()
+            stop_service()
+            start_service()
 
 # ------ END-RESTARTERS ------#
 
+@task
 def env_run(cmd):
-    return sudo(cmd) if env.environment_class in ['production', 'celery'] else run(cmd)
+    return sudo(cmd) if env.environment_class in ['production', 'staging', 'celery'] else run(cmd)
 
 @task
 def deploy_archive_file():
@@ -291,7 +317,7 @@ def deploy_archive_file():
     if not files.exists('%s/%s' % (env.deploy_archive_path, file_name)):
         as_sudo = env.environment_class in ['production', 'celery']
         put('/tmp/%s' % file_name, env.deploy_archive_path, use_sudo=as_sudo)
-        env_run('chown %s:%s %s' % (env.application_user, env.application_user, env.deploy_archive_path) )
+        sudo('chown %s:%s %s' % (env.application_user, env.application_user, env.deploy_archive_path) )
 
 
 def clean_zip():
@@ -306,22 +332,22 @@ def relink():
 
     version_path = '%sversions' % env.remote_project_path
     full_version_path = '%s/%s' % (version_path, env.SHA1_FILENAME)
-    project_path = '%s%s' % (env.remote_project_path, env.project,)
+    project_path = '%s%s' % (env.remote_project_path, 'current',)
 
     if not env.is_predeploy:
         if files.exists('%s/%s' % (version_path, env.SHA1_FILENAME)): # check the sha1 dir exists
             #if files.exists(project_path, use_sudo=True): # unlink the glynt dir
-            if files.exists('%s/%s' % (env.remote_project_path, env.project)): # check the current glynt dir exists
+            if files.exists('%s/%s' % (env.remote_project_path, 'current')): # check the current glynt dir exists
                 virtualenv('unlink %s' % project_path)
             virtualenv('ln -s %s/%s %s' % (version_path, env.SHA1_FILENAME, project_path,)) # relink
+@task
+def reread_supervisor():
+    sudo('supervisorctl reread')
 
 @task
 def clean_start():
     stop_service()
-    clean_pyc()
-    #clear_cache()
-    clean_pyc()
-    #precompile_pyc()
+    reread_supervisor()
     start_service()
     clean_zip()
 
@@ -332,12 +358,11 @@ def do_deploy():
 
     version_path = '%sversions' % env.remote_project_path
     full_version_path = '%s/%s' % (version_path, env.SHA1_FILENAME)
-    project_path = '%s%s' % (env.remote_project_path, env.project,)
+    project_path = '%s%s' % (env.remote_project_path, 'current',)
 
-    if env.environment_class in ['production', 'celery']:
-        if not files.exists(version_path):
-            env_run('mkdir -p %s' % version_path )
-        sudo('chown -R %s:%s %s' % (env.application_user, env.application_user, env.remote_project_path) )
+    if not files.exists(version_path):
+        env_run('mkdir -p %s' % version_path )
+    sudo('chown -R %s:%s %s' % (env.application_user, env.application_user, env.remote_project_path) )
 
     deploy_archive_file()
 
@@ -353,21 +378,35 @@ def update_env_conf():
 
     version_path = '%sversions' % env.remote_project_path
     full_version_path = '%s/%s' % (version_path, env.SHA1_FILENAME)
-    project_path = '%s%s' % (env.remote_project_path, env.project,)
+    project_path = '%s%s' % (env.remote_project_path, 'current',)
 
     if not env.is_predeploy:
         # copy the live local_settings
         with cd(project_path):
-            virtualenv('cp %s/conf/%s.local_settings.py %s/%s/local_settings.py' % (full_version_path, env.environment, full_version_path, env.project))
-            virtualenv('cp %s/conf/%s.wsgi.py %s/%s/wsgi.py' % (full_version_path, env.environment, full_version_path, env.project))
+            put(local_path='./config/environments/%s/%s/local_settings.py' % (env.environment_class, env.project), remote_path='%s%s/%s/local_settings.py' % (env.remote_project_path, 'current', env.project))  # this is the one to be read
+            # set_code_version()
 
-        secret_settings = '%s/conf/secret.%s.local_settings.py' % (env.local_project_path, env.environment)
-        if os.path.exists(secret_settings):
-            put('%s %s/%s/' % (secret_settings, full_version_path, env.project), env.deploy_archive_path, use_sudo=as_sudo)
+@task
+def set_code_version():
+    if env.SHA1_FILENAME is None:
+        env.SHA1_FILENAME = get_sha1()
+
+    version_path = '%sversions' % env.remote_project_path
+    full_version_path = '%s/%s' % (version_path, env.SHA1_FILENAME)
+
+    cmd = 'echo "CODE_VERSION=\'%s\'" > mgmeckern/settings/code_version.py' % env.SHA1_FILENAME
+
+    with cd(full_version_path):
+        if env.environment in ['local']:
+            local(cmd)
+        else:
+            virtualenv(cmd)
+
 
 @task
 def unzip_archive():
     version_path = '%sversions' % env.remote_project_path
+
     with cd('%s' % version_path):
         virtualenv('unzip %s%s.zip -d %s' % (env.deploy_archive_path, env.SHA1_FILENAME, version_path,))
 
@@ -379,53 +418,167 @@ def start_service():
 def stop_service():
     env_run(env.stop_service)
 
-@task
 def fixtures():
-    # Activate virtualenv
-    virtualenv('python %s/%s/manage.py loaddata %s' % (env.remote_project_path, env.project, env.fixtures,))
+    # if were in any non staging,prod env then load the dev fixtures too
+    return env.fixtures + ' ' + env.dev_fixtures if env.environment not in ['production', 'staging'] else env.fixtures
 
 
 @task
 def assets():
-    # Activate virtualenv
-    virtualenv('python %s%s/manage.py collectstatic --noinput' % (env.remote_project_path, env.project,))
-    #virtualenv('python %s%s/manage.py compress --force' % (env.remote_project_path, env.project,))
+    local('rm -Rf ./static')
+    # collect static components
+    local('python ./manage.py collectstatic --noinput')
+    local('tar cvzf static.tar.gz ./static')
+    put('static.tar.gz', env.remote_project_path)
+    run('tar -zxvf %sstatic.tar.gz -C %s' % (env.remote_project_path, env.remote_project_path))
+    run('rm %sstatic.tar.gz' % env.remote_project_path)
+    local('rm static.tar.gz')
+
 
 @task
 def requirements():
     sha = env.get('SHA1_FILENAME', None)
     if sha is None:
         env.SHA1_FILENAME = get_sha1()
-    
+
     project_path = '%sversions/%s' % (env.remote_project_path, env.SHA1_FILENAME,)
     requirements_path = '%s/requirements.txt' % (project_path, )
 
     virtualenv('pip install -r %s' % requirements_path )
 
+@task
+@serial
+@runs_once
+def newrelic_note():
+    if not hasattr(env, 'deploy_desc'):
+        env.deploy_desc = prompt(colored('Hi %s, Please provide a Deployment Note:' % env.local_user, 'yellow'))
+
+@task
+@serial
+@runs_once
+def newrelic_deploynote():
+    if not env.deploy_desc:
+        print(colored('No env.deploy_desc was defined cant post to new relic', 'yellow'))
+    else:
+        description = '[env:%s][%s@%s] %s' % (env.environment, env.user, env.host, env.deploy_desc)
+        headers = {
+            'x-api-key': env.newrelic_api_token
+        }
+
+        payload = {
+            'deployment[app_name]': env.newrelic_app_name, # new relc wants either app_name or application_id not both
+            #'deployment[application_id]': env.newrelic_application_id,
+            'deployment[description]': description,
+            'deployment[user]': env.local_user,
+            'deployment[revision]': get_sha1()
+        }
+
+        colored('Sending Deployment Message to NewRelic', 'blue')
+
+        r = requests.post('https://rpm.newrelic.com/deployments.xml', data=payload, headers=headers, verify=False)
+
+        is_ok = r.status_code in [200,201]
+        text = 'DeploymentNote Recorded OK' if is_ok is True else 'DeploymentNote Recorded Not OK: %s' % r.text
+        color = 'green' if is_ok else 'red'
+
+        print(colored('%s (%s)' % (text, r.status_code), color))
+
+
+@task
+@runs_once
+@roles('cron-actor')
+def crontabs():
+    if env.environment_class in ['production']:
+        update_open_zendesk_tickets = '0 * * * 1,2,3,4,5  cd %s/%s && %sbin/python manage.py update_open_zendesk_tickets' % (env.remote_project_path, 'current', env.virtualenv_path)
+        crontab.crontab_update(update_open_zendesk_tickets, 'update-open-zendesk-tickets')
+
+        # Must always run 30 mins after the update_open_zendesk_tickets
+        # as it will read from the latest tickets results list generated by: update_open_zendesk_tickets
+        zendesk_ticket_report = '30 8 * * 1,2,3,4,5  cd %s/%s && %sbin/python manage.py zendesk_ticket_report' % (env.remote_project_path, 'current', env.virtualenv_path)
+        crontab.crontab_update(zendesk_ticket_report, 'zendesk-ticket-report')
 
 @task
 @serial
 @runs_once
 def diff():
     diff = prompt(colored("View diff? [y,n]", 'magenta'), default="y")
-    if diff.lower() in ['y','yes', 1, '1']:
+    if diff.lower() in TRUTHY:
         print(diff_outgoing_with_current())
 
 @task
-def rebuild_local():
-    if not os.path.exists('glynt/local_settings.py'):
-        local('cp conf/dev.local_settings.py glynt/local_settings.py')
+@serial
+@runs_once
+def run_tests():
+    run_tests = prompt(colored("Run Tests? [y,n]", 'yellow'), default="y")
+    if run_tests.lower() in TRUTHY:
 
-    if os.path.exists('./dev.db'):
-        new_db_name = '/tmp/dev.%s.db.bak' % env.timestamp
-        local('cp ./dev.db %s' % new_db_name)
-        print colored('Local Database Backedup %s...' % new_db_name, 'green')
-        local('rm ./dev.db')
+        result = local('python manage.py test')
 
-    local('python manage.py syncdb')
-    local('python manage.py migrate')
-    local('python manage.py loaddata {fixtures}'.format(fixtures=env.fixtures))
+        if result not in ['', 1, True]:
+            error(colored('You may not proceed as the tests are not passing', 'orange'))
 
+
+
+#----
+@task
+def repos():
+    """
+    Adds common repositories to the system, to help get the latest version of packages
+    :return:
+    """
+    sudo('add-apt-repository -y multiverse')
+    sudo('add-apt-repository -y restricted')
+    sudo('add-apt-repository -y ppa:git-core/ppa')
+    sudo('add-apt-repository -y ppa:mercurial-ppa/releases')
+    sudo('add-apt-repository -y ppa:webupd8team/java')
+    sudo('curl -sL https://deb.nodesource.com/setup_dev | sudo bash -')  # nodejs ppa for node latest
+    sudo('aptitude update')
+
+@task
+def chores():
+    inst = lambda pkglist: sudo('aptitude --assume-yes install %s' % pkglist)
+
+    #sudo("aptitude update")
+
+    inst('libffi-dev ntp nmap htop vim unzip gettext')  # system level utilities. need ntp to keep clocks in sync, eh
+    inst('git mercurial subversion ')  # version control
+    inst('build-essential apache2-utils libjpeg8 libjpeg62-dev libfreetype6 libfreetype6-dev')
+    inst('libtidy-dev postgresql-server-dev-all postgresql-client libpq-dev libxml2-dev libxslt1-dev')
+
+    inst('python-setuptools python-dev uwsgi-plugin-python python-psycopg2')
+
+    #inst('default-jre default-jre-headless default-jdk')  # java stuff
+
+    inst('nginx uwsgi supervisor')  # web servers and related admin
+
+    #inst('libgeos-dev')  # geodata
+
+    sudo('easy_install pip')
+    sudo('pip install virtualenv virtualenvwrapper')
+    sudo('pip install uwsgi')
+    sudo('pip install pyopenssl ndg-httpsclient pyasn1 requests[security]')
+    sudo('pip install newrelic')
+
+
+@task
+def add_user():
+    sudo('adduser --disabled-password --gecos "" django')
+
+
+@task
+def paths():
+    # run('echo "WORKON_HOME=$HOME/.virtualenvs" >> $HOME/.bash_profile')
+    # run('echo "source /usr/local/bin/virtualenvwrapper.sh" >> $HOME/.bash_profile')
+    # run('echo "source $HOME/.bash_profile" >> $HOME/.bashrc')
+    run('mkdir -p ~/.virtualenvs')
+    run('mkdir -p ~/apps/mgmeckern/versions/tmp')
+    run('ln -s ~/apps/mgmeckern/versions/tmp ~/apps/mgmeckern/current')
+    # pass
+
+@task
+def upload_db():
+    put('db.sqlite3', '/home/django/apps/mgmeckern/')
+#-------
 
 @task
 def deploy(is_predeploy='False',full='False',db='False',search='False'):
@@ -433,21 +586,21 @@ def deploy(is_predeploy='False',full='False',db='False',search='False'):
     :is_predeploy=True - will deploy the latest MASTER SHA but not link it in: this allows for assets collection
     and requirements update etc...
     """
-    env.is_predeploy = is_predeploy.lower() in env.truthy
-    full = full.lower() in env.truthy
-    db = db.lower() in env.truthy
-    search = search.lower() in env.truthy
-
-    diff()
-    git_set_tag()
+    env.is_predeploy = is_predeploy.lower() in TRUTHY
+    full = full.lower() in TRUTHY
+    db = db.lower() in TRUTHY
+    search = search.lower() in TRUTHY
 
     prepare_deploy()
-    do_deploy()
-    update_env_conf()
 
-    if full:
-        requirements()
+    do_deploy()
+    #paths()
+    put_confs()
+
+    requirements()
 
     relink()
+    update_env_conf()
     assets()
     clean_start()
+    #crontabs()
